@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdventOfCode2022", "AdventOfCode2022\AdventOfCode2022.csproj", "{DE837A69-C905-42B8-8799-6C074881115A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8A5925D7-212B-4E65-AC78-42B98834888A}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{C3AD8442-4A40-46D5-876D-D160D56DF8B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Input", "Input", "{7395B54E-1741-488C-BBFD-9D6D135C6F0F}"
+	ProjectSection(SolutionItems) = preProject
+		Input\Day1.txt = Input\Day1.txt
+		Input\Day10.txt = Input\Day10.txt
+		Input\Day11.txt = Input\Day11.txt
+		Input\Day12.txt = Input\Day12.txt
+		Input\Day13.txt = Input\Day13.txt
+		Input\Day14.txt = Input\Day14.txt
+		Input\Day15.txt = Input\Day15.txt
+		Input\Day16.txt = Input\Day16.txt
+		Input\Day17.txt = Input\Day17.txt
+		Input\Day18.txt = Input\Day18.txt
+		Input\Day19.txt = Input\Day19.txt
+		Input\Day2.txt = Input\Day2.txt
+		Input\Day20.txt = Input\Day20.txt
+		Input\Day21.txt = Input\Day21.txt
+		Input\Day22.txt = Input\Day22.txt
+		Input\Day23.txt = Input\Day23.txt
+		Input\Day24.txt = Input\Day24.txt
+		Input\Day25.txt = Input\Day25.txt
+		Input\Day3.txt = Input\Day3.txt
+		Input\Day4.txt = Input\Day4.txt
+		Input\Day5.txt = Input\Day5.txt
+		Input\Day6.txt = Input\Day6.txt
+		Input\Day7.txt = Input\Day7.txt
+		Input\Day8.txt = Input\Day8.txt
+		Input\Day9.txt = Input\Day9.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE837A69-C905-42B8-8799-6C074881115A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE837A69-C905-42B8-8799-6C074881115A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE837A69-C905-42B8-8799-6C074881115A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE837A69-C905-42B8-8799-6C074881115A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3AD8442-4A40-46D5-876D-D160D56DF8B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3AD8442-4A40-46D5-876D-D160D56DF8B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3AD8442-4A40-46D5-876D-D160D56DF8B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3AD8442-4A40-46D5-876D-D160D56DF8B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {48058CBD-41AD-4EAE-A606-30B94BD39851}
+	EndGlobalSection
+EndGlobal
