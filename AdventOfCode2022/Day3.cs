@@ -2,14 +2,21 @@
 
 public class Day3 : ISolver
 {
-    public (string, string) ExpectedResult => ("", "");
+    public (string, string) ExpectedResult => ("7831", "");
 
     public (string, string) Solve(string[] input)
     {
-        return ($"{Part1(input)}", $"{Part2(input)}");
+        return (Part1(input), Part2(input));
     }
 
-    long Part1(IEnumerable<string> input) => throw new NotImplementedException();
-    long Part2(IEnumerable<string> input) => throw new NotImplementedException();
+    int Priority(char c) => c >= 'a' ? c - 'a' + 1 : c - 'A' + 27;
+
+    string Part1(IEnumerable<string> input) => input
+            .Select(r => (r[..(r.Length / 2)], r[(r.Length / 2)..]))
+            .Select(a => Priority(a.Item1.Intersect(a.Item2).Single()))
+            .Sum().ToString();
+                   
+
+    string Part2(IEnumerable<string> input) => "";
 
 }
