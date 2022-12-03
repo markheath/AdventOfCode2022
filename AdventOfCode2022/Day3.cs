@@ -2,7 +2,7 @@
 
 public class Day3 : ISolver
 {
-    public (string, string) ExpectedResult => ("7831", "");
+    public (string, string) ExpectedResult => ("7831", "2683");
 
     public (string, string) Solve(string[] input)
     {
