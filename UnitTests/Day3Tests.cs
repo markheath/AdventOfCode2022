@@ -16,6 +16,6 @@ ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw".Split("\r\n");
         var solver = new Day3();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("157", ""), solution);
+        Assert.AreEqual(("157", "70"), solution);
     }
 }

@@ -17,6 +17,9 @@ public class Day3 : ISolver
             .Sum().ToString();
                    
 
-    string Part2(IEnumerable<string> input) => "";
+    string Part2(IEnumerable<string> input) => input
+            .Chunk(3)
+            .Select(c => Priority(c[0].Intersect(c[1]).Intersect(c[2]).Single()))
+            .Sum().ToString();
 
 }
