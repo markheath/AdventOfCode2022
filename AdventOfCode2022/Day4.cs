@@ -2,14 +2,22 @@
 
 public class Day4 : ISolver
 {
-    public (string, string) ExpectedResult => ("", "");
+    public (string, string) ExpectedResult => ("450", "");
 
     public (string, string) Solve(string[] input)
     {
         return ($"{Part1(input)}", $"{Part2(input)}");
     }
 
-    long Part1(IEnumerable<string> input) => throw new NotImplementedException();
-    long Part2(IEnumerable<string> input) => throw new NotImplementedException();
+    private bool Contains(int[] numbers)
+    {
+        return (numbers[0] >= numbers[2] && numbers[1] <= numbers[3]) ||
+            (numbers[0] <= numbers[2] && numbers[1] >= numbers[3]);
+    }
+
+    long Part1(IEnumerable<string> input) =>
+        input.Select(n => n.Split(',', '-').Select(int.Parse).ToArray())
+        .Count(n => Contains(n));
+    long Part2(IEnumerable<string> input) => 0;
 
 }
