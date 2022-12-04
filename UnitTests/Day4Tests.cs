@@ -16,6 +16,6 @@ public class Day4Tests
 2-6,4-8".Split("\r\n");
         var solver = new Day4();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("2", ""), solution);
+        Assert.AreEqual(("2", "4"), solution);
     }
 }
