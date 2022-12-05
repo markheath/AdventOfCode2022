@@ -5,11 +5,11 @@ namespace AdventOfCode2022;
 
 public class Day5 : ISolver
 {
-    public (string, string) ExpectedResult => ("WHTLRMZRC", "");
+    public (string, string) ExpectedResult => ("WHTLRMZRC", "GMPMLWNMG");
 
     public (string, string) Solve(string[] input)
     {
-        return (Part1(ParseStartingState(input), input), Part2(ParseStartingState(input), input));
+        return (Solve(ParseStartingState(input), input,1), Solve(ParseStartingState(input), input,2));
     }
 
     Stack<char>[] ParseStartingState(string[] input)
@@ -34,22 +34,20 @@ public class Day5 : ISolver
         return stacks;
     }
 
-    string Part1(Stack<char>[] state, IEnumerable<string> input)
+    string Solve(Stack<char>[] state, IEnumerable<string> input, int part)
     {
         var regex = new Regex(@"move (\d+) from (\d+) to (\d+)");
         foreach (var instruction in input.Select(n => regex.Match(n))
                 .Where(m => m.Success)
                 .Select(m => new { Amount = int.Parse(m.Groups[1].Value), From = int.Parse(m.Groups[2].Value), To = int.Parse(m.Groups[3].Value) }))
         {
-            Console.WriteLine($"move {instruction.Amount} from {instruction.From} to {instruction.To}");
-            for (var n = 0; n < instruction.Amount; n++)
-            {
-                state[instruction.To - 1].Push(state[instruction.From - 1].Pop());
-            }
+            //Console.WriteLine($"move {instruction.Amount} from {instruction.From} to {instruction.To}");
+            if (part == 1)
+                Enumerable.Range(1, instruction.Amount).ForEach(n => state[instruction.To - 1].Push(state[instruction.From - 1].Pop()));
+            else
+                Enumerable.Range(1, instruction.Amount).Select(n => state[instruction.From - 1].Pop()).Reverse().ForEach(n => state[instruction.To - 1].Push(n));
         }
         return string.Concat(state.Select(s => s.Pop()));
     }
-
-    string Part2(Stack<char>[] startingState, IEnumerable<string> input) => "";
 
 }
