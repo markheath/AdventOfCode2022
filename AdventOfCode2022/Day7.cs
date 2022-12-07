@@ -1,10 +1,11 @@
 ﻿using System.Text.RegularExpressions;
+using static AdventOfCode2022.Day7;
 
 namespace AdventOfCode2022;
 
 public class Day7 : ISolver
 {
-    public (string, string) ExpectedResult => ("1778099", "");
+    public (string, string) ExpectedResult => ("1778099", "1623571");
 
     public (string, string) Solve(string[] input)
     {
@@ -91,6 +92,15 @@ public class Day7 : ISolver
         var folder = ParseInput(input);
         return folder.GetChildFolders().Select(v =>v.GetSize()).Where(v => v <= 100000).Sum();
     }
-    long Part2(IEnumerable<string> input) => 0;
+
+    public long Part2(IEnumerable<string> input)
+    {
+        var diskSize = 70000000L;
+        var needed = 30000000L;
+        var rootFolder = ParseInput(input);
+        var available = diskSize - rootFolder.GetSize();
+        var toDelete = needed - available;
+        return rootFolder.GetChildFolders().Select(v => v.GetSize()).OrderBy(n => n).Where(v => v >= toDelete).First();
+    }
 
 }

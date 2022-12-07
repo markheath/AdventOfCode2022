@@ -47,7 +47,7 @@ $ ls
         var solver = new Day7();
         var root = solver.ParseInput(testInput);
         var dict = root.GetChildFolders().ToDictionary(f => f.Name, f => f.GetSize());
-
+        dict[root.Name] = root.GetSize();
         Assert.That(dict[folderName], Is.EqualTo(expectedSize));
     }
     [Test]
@@ -59,5 +59,14 @@ $ ls
 
         Assert.That(part1, Is.EqualTo(95437));
     }
-    
+
+    [Test]
+    public void Part2()
+    {
+        var testInput = TestInput.Split("\r\n");
+        var solver = new Day7();
+        var part2 = solver.Part2(testInput);
+
+        Assert.That(part2, Is.EqualTo(24933642));
+    }
 }
