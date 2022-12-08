@@ -1,12 +1,6 @@
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System;
+using System.Linq;
 using AdventOfCode2022;
 using NUnit.Framework;
-using NUnit.Framework.Internal.Execution;
-using static AdventOfCode2022.Day7;
-using System.Linq;
 
 namespace UnitTests;
 
