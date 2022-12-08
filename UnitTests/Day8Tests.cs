@@ -14,13 +14,12 @@ public class Day8Tests
 35390";
 
     [Test]
-    public void Part1()
+    public void Day8Solution()
     {
         var testInput = TestInput.Split("\r\n");
         var solver = new Day8();
-        var part1 = solver.Part1(testInput);
-
-        Assert.That(part1, Is.EqualTo(21));
+        var solution = solver.Solve(testInput);
+        Assert.AreEqual(("21", "8"), solution);
     }
 
 }

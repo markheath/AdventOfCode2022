@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AdventOfCode2022;
 
-class Grid<T>
+public class Grid<T>
 {
     // for those cases where the grid is single digit numbers
     public static Grid<int> ParseToGrid(string[] input)
