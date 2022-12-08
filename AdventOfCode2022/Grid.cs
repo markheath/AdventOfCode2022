@@ -80,7 +80,7 @@ public class Grid<T>
         {
             for(var x= 0; x < Width;x++)
             {
-                s.Append(this[(x, y)].ToString());
+                s.Append($"{this[(x, y)]}");
             }
             s.AppendLine();
         }

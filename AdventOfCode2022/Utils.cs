@@ -4,7 +4,7 @@ namespace AdventOfCode2022;
 
 public static class Utils
 {
-    public static string FindPath(string fileName, string path = ".")
+    public static string? FindPath(string fileName, string path = ".")
     {
         var fullPath = Path.Combine(path, fileName);
         if (File.Exists(fullPath))
@@ -28,7 +28,7 @@ public static class Utils
             if (path != null)
             {
                 var input = File.ReadAllLines(path);
-                yield return ((ISolver)Activator.CreateInstance(solver), input);
+                yield return ((ISolver)Activator.CreateInstance(solver)!, input);
             }
         }
     }

@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using AdventOfCode2022;
 
-var (solver,input) = Utils.FindAllSolvers().Last(x => x.Input.Length > 0);
+// they're sorted in reverse
+var (solver,input) = Utils.FindAllSolvers().First(x => x.Input.Length > 0); 
 Console.WriteLine($"Solving for day {solver.GetType().Name[3..]}");
 var sw = Stopwatch.StartNew();
 var (a,b) = solver.Solve(input);

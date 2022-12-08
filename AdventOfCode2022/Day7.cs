@@ -18,9 +18,9 @@ public class Day7 : ISolver
         public List<Folder> Folders { get; }
         public List<File> Files { get; }
         public string Name { get; }
-        public Folder Parent { get; }
+        public Folder? Parent { get; }
 
-        public Folder(string name, Folder parent)
+        public Folder(string name, Folder? parent)
         {
             Files = new List<File>();
             Folders = new List<Folder>();
@@ -49,13 +49,14 @@ public class Day7 : ISolver
 
     public Folder ParseInput(IEnumerable<string> input)
     {
-        Folder currentFolder = null;
+        Folder? currentFolder = null;
         foreach (var line in input)
         {
             if (line.StartsWith("$ cd"))
             {
                 if (line.EndsWith(".."))
                 {
+                    if (currentFolder == null) throw new InvalidOperationException("no current folder, can't go up");
                     currentFolder = currentFolder.Parent;
                 }
                 else
@@ -77,11 +78,13 @@ public class Day7 : ISolver
             {
                 var regex = new Regex(@"(\d+) (\S+)");
                 var match = regex.Match(line);
+                if (currentFolder == null) throw new InvalidOperationException("no current folder, can't add file");
                 currentFolder.Files.Add(new File(match.Groups[2].Value, long.Parse(match.Groups[1].Value)));
             }
         }
-        var root = currentFolder;
-        while(root.Parent != null) { root = currentFolder.Parent; }
+        if (currentFolder == null) throw new InvalidOperationException("no folders found in input");
+        var root = currentFolder!;
+        while(root!.Parent != null) { root = root.Parent; }
         return root;
     }
 

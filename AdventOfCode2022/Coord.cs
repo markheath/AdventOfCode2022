@@ -37,7 +37,7 @@ public struct Coord : IEnumerable<int>, IEquatable<Coord>
         return new Coord(a.x + b.x, a.y + b.y);
     }
 
-    public override bool Equals(object other) =>
+    public override bool Equals(object? other) =>
         other is Coord c
             && c.x.Equals(x)
             && c.y.Equals(y);
