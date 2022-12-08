@@ -9,7 +9,12 @@ public class Day8 : ISolver
         return ($"{Part1(input)}", $"{Part2(input)}");
     }
 
-    long Part1(IEnumerable<string> input) => throw new NotImplementedException();
-    long Part2(IEnumerable<string> input) => throw new NotImplementedException();
+    public long Part1(string[] input)
+    {
+        var g = Grid<int>.ParseToGrid(input);
+        var dirs = new[] { (0, 1), (1, 0), (0, -1), (-1, 0) };
+        return g.AllPositions().Count(p =>  dirs.Any(d => g.LineOut(p,d).All(n => g[p] > g[n])));
+    }
+    public long Part2(IEnumerable<string> input) => 0;
 
 }

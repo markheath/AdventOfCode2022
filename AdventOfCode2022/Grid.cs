@@ -53,6 +53,16 @@ class Grid<T>
                 yield return new Coord(x, y);
     }
 
+    public IEnumerable<Coord> LineOut(Coord startingPos, Coord delta)
+    {
+        var pos = startingPos + delta;
+        while(IsInGrid(pos))
+        {
+            yield return pos;
+            pos += delta;
+        }
+    }
+
     private readonly IEnumerable<Coord> horizontalNeighbours = new[] { new Coord(-1, 0), new Coord(1, 0), new Coord(0, -1), new Coord(0, 1) };
     private readonly IEnumerable<Coord> diagonalNeigbours = new[] { new Coord(-1, -1), new Coord(1, 1), new Coord(1, -1), new Coord(-1, 1) };
     
