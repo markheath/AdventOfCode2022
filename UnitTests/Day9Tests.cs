@@ -17,12 +17,29 @@ L 5
 R 2";
 
     [Test]
-    public void Day9TestInput()
+    public void Day9Part1TestInput()
     {
         var testInput = TestInput.Split("\r\n");
         var solver = new Day9();
-        var solution = solver.Solve(testInput);
-        Assert.AreEqual(("13", "0"), solution);
+        var solution = solver.Solve(testInput,2);
+        Assert.AreEqual(13, solution);
+    }
+
+
+    [Test]
+    public void Day9Part2TestInput()
+    {
+        var testInput = @"R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20".Split("\r\n");
+        var solver = new Day9();
+        var solution = solver.Solve(testInput, 10);
+        Assert.AreEqual(36, solution);
     }
 
 }
