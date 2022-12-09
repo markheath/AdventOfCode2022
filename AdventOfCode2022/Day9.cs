@@ -11,9 +11,8 @@ public class Day9 : ISolver
 
     public long Solve(IEnumerable<string> input, int ropeLength)
     {
-        var rope = Enumerable.Range(0, ropeLength).Select(_ => new Coord(0, 0)).ToArray(); 
-        var tailVisited = new HashSet<Coord>();
-        tailVisited.Add(rope.Last());
+        var rope = new Coord[ropeLength];
+        var tailVisited = new HashSet<Coord> { rope.Last() };
         foreach (var inst in input)
         {
             var dir = inst[0] switch { 'R' => (1, 0), 'L' => (-1, 0), 'U' => (0, 1), 'D' => (0, -1) };
@@ -24,31 +23,32 @@ public class Day9 : ISolver
                 rope[0] += dir;
                 for(var n = 1; n < rope.Length; n++)
                 {
-                    var headPos = rope[n-1];
-                    var tailPos = rope[n];
-                    if (Math.Max(Math.Abs(headPos.X - tailPos.X), Math.Abs(headPos.Y - tailPos.Y)) >= 2)
-                    {
-                        if (headPos.X == tailPos.X || headPos.Y == tailPos.Y)
-                        {
-                            // move tail towards head if 2 away
-                            tailPos += ((headPos.X - tailPos.X) / 2,
-                                        (headPos.Y - tailPos.Y) / 2);
-                        }
-                        else
-                        {
-                            // move diagonally towards head
-                            tailPos += ((headPos.X > tailPos.X) ? 1 : -1,
-                                        (headPos.Y > tailPos.Y) ? 1 : -1);
-                        }
-                    }
-                    rope[n] = tailPos;
+                    rope[n] = CalculateNewTailPos(rope[n - 1], rope[n]);
                 }
                 tailVisited.Add(rope.Last());
-
             }
         }
         return tailVisited.Count;
     }
-    long Part2(IEnumerable<string> input) => 0;
 
+    private static Coord CalculateNewTailPos(Coord headPos, Coord tailPos)
+    {
+        if (Math.Max(Math.Abs(headPos.X - tailPos.X), Math.Abs(headPos.Y - tailPos.Y)) >= 2)
+        {
+            if (headPos.X == tailPos.X || headPos.Y == tailPos.Y)
+            {
+                // move tail towards head if 2 away
+                tailPos += ((headPos.X - tailPos.X) / 2,
+                            (headPos.Y - tailPos.Y) / 2);
+            }
+            else
+            {
+                // move diagonally towards head
+                tailPos += ((headPos.X > tailPos.X) ? 1 : -1,
+                            (headPos.Y > tailPos.Y) ? 1 : -1);
+            }
+        }
+
+        return tailPos;
+    }
 }
