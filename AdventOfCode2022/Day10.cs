@@ -1,11 +1,17 @@
 ﻿using System.Text;
+using SuperLinq;
 
 namespace AdventOfCode2022;
 
 public class Day10 : ISolver
 {
-    
-    public (string, string) ExpectedResult => ("14060", "PAPKFKEJ");
+    // PAPKFKEJ
+    public (string, string) ExpectedResult => ("14060", @"###...##..###..#..#.####.#..#.####...##.
+#..#.#..#.#..#.#.#..#....#.#..#.......#.
+#..#.#..#.#..#.##...###..##...###.....#.
+###..####.###..#.#..#....#.#..#.......#.
+#....#..#.#....#.#..#....#.#..#....#..#.
+#....#..#.#....#..#.#....#..#.####..##..");
 
     public (string, string) Solve(string[] input)
     {
@@ -17,13 +23,9 @@ public class Day10 : ISolver
         int X = 1;
         foreach (var inst in input)
         {
-            if (inst == "noop")
-            {
-                yield return X;
-            }
+            yield return X;
             if (inst.StartsWith("addx"))
             {
-                yield return X;
                 yield return X;
                 X += int.Parse(inst[5..]);
             }
@@ -36,11 +38,11 @@ public class Day10 : ISolver
         var targets = new[] { 20, 60, 100, 140, 180, 220 };
         return targets.Select(t => output[t - 1] * t).Sum();
     }
-    long Part2(IEnumerable<string> input)
+    public string Part2(IEnumerable<string> input)
     {
-        foreach(var c in Compute(input).Chunk(40))
+        var sb = new StringBuilder();
+        foreach (var c in Compute(input).Chunk(40))
         {
-            var sb = new StringBuilder();
             for(int r = 0; r < c.Length; r++)
             {
                 if (Math.Abs(c[r] - r) < 2)
@@ -48,9 +50,11 @@ public class Day10 : ISolver
                 else
                     sb.Append('.');
             }
-            Console.WriteLine(sb);
+            sb.AppendLine();
         }
-        return 0;
+        // Console.WriteLine(sb);
+        sb.Length -= 2;
+        return sb.ToString();
     }
 
 }

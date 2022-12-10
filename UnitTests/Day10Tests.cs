@@ -7,12 +7,7 @@ namespace UnitTests;
 public class Day10Tests
 {
 
-    private const string TestInput = @"";
-
-    [Test]
-    public void Day10Part1TestInput()
-    {
-        var testInput = @"addx 15
+    private const string TestInput = @"addx 15
 addx -11
 addx 6
 addx -3
@@ -157,7 +152,12 @@ addx -6
 addx -11
 noop
 noop
-noop".Split("\r\n");
+noop";
+
+    [Test]
+    public void Day10Part1TestInput()
+    {
+        var testInput = TestInput.Split("\r\n");
         var solver = new Day10();
         var solution = solver.Part1(testInput);
         Assert.AreEqual(13140, solution);
@@ -167,10 +167,15 @@ noop".Split("\r\n");
     [Test]
     public void Day10Part2TestInput()
     {
-        var testInput = @"".Split("\r\n");
+        var testInput = TestInput.Split("\r\n");
         var solver = new Day10();
-        var solution = 0; // solver.Part2(testInput);
-        Assert.AreEqual(36, solution);
+        var solution = solver.Part2(testInput);
+        Assert.AreEqual(@"##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....", solution);
     }
 
 }
