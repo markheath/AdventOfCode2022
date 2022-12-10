@@ -1,11 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Text;
 
 namespace AdventOfCode2022;
 
 public class Day10 : ISolver
 {
     
-    public (string, string) ExpectedResult => ("14060", "");
+    public (string, string) ExpectedResult => ("14060", "PAPKFKEJ");
 
     public (string, string) Solve(string[] input)
     {
@@ -35,36 +35,22 @@ public class Day10 : ISolver
         var output = Compute(input).ToArray();
         var targets = new[] { 20, 60, 100, 140, 180, 220 };
         return targets.Select(t => output[t - 1] * t).Sum();
-        /*var X = 1;
-        var cycle = 1;
-        long signalStrength = 0;
-        var targetPos = 0;
-        foreach(var inst in input)
-        {
-            if (cycle >= targets[targetPos])
-            {
-                signalStrength += X * targets[targetPos];
-                targetPos++;
-                if (targetPos >= targets.Length) break;
-            }
-
-            if (inst == "noop")
-            {
-                cycle ++;
-            }
-            if (inst.StartsWith("addx"))
-            {
-                X += int.Parse(inst[5..]);
-                cycle += 2;
-            }
-        }
-        while(targetPos < targets.Length)
-        {
-            signalStrength += X * targets[targetPos];
-            targetPos++;
-        }
-        return signalStrength;*/
     }
-    long Part2(IEnumerable<string> input) => 0;
+    long Part2(IEnumerable<string> input)
+    {
+        foreach(var c in Compute(input).Chunk(40))
+        {
+            var sb = new StringBuilder();
+            for(int r = 0; r < c.Length; r++)
+            {
+                if (Math.Abs(c[r] - r) < 2)
+                    sb.Append('#');
+                else
+                    sb.Append('.');
+            }
+            Console.WriteLine(sb);
+        }
+        return 0;
+    }
 
 }
