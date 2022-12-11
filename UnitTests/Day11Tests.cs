@@ -39,7 +39,7 @@ Monkey 3:
     If false: throw to monkey 1".Split("\r\n");
         var solver = new Day11();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("10605", "0"), solution);
+        Assert.AreEqual(("10605", "2713310158"), solution);
     }
 
     [Test]
