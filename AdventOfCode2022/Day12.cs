@@ -36,7 +36,6 @@ public class Day12 : ISolver
         var positions = new Queue<Coord>();
         positions.Enqueue(startPos);
         distances.Add(startPos, 0);
-        var directions = new Coord[] { (0, 1), (1, 0), (0, -1), (-1, 0) };
         //Console.WriteLine($"START AT {startPos}");
 
         while (positions.TryDequeue(out var pos))
@@ -48,11 +47,9 @@ public class Day12 : ISolver
                 return distance;
             }
 
-            foreach(var direction in directions) 
+            foreach(var testPos in grid.Neighbours(pos))
             {
-                var testPos = pos + direction;
-
-                if (grid.IsInGrid(testPos) && !distances.ContainsKey(testPos) )
+                if (!distances.ContainsKey(testPos) )
                 {
                     var testElevation = grid[testPos];
                     if (canMove(elevation,testElevation))
