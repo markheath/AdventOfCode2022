@@ -31,11 +31,8 @@ public class Day12 : ISolver
 
     long FindShortestDistance(Grid<char> grid, Coord startPos, Func<Coord,bool> endTest, Func<int,int,bool> canMove)
     {
-        var distances = new Dictionary<Coord, int>();
-
-        var positions = new Queue<Coord>();
-        positions.Enqueue(startPos);
-        distances.Add(startPos, 0);
+        var distances = new Dictionary<Coord, int>() { { startPos, 0 } };
+        var positions = new Queue<Coord>(new[] { startPos });
         //Console.WriteLine($"START AT {startPos}");
 
         while (positions.TryDequeue(out var pos))
@@ -47,17 +44,14 @@ public class Day12 : ISolver
                 return distance;
             }
 
-            foreach(var testPos in grid.Neighbours(pos))
+            foreach(var testPos in grid.Neighbours(pos).Where(p => !distances.ContainsKey(p)))
             {
-                if (!distances.ContainsKey(testPos) )
+                var testElevation = grid[testPos];
+                if (canMove(elevation,testElevation))
                 {
-                    var testElevation = grid[testPos];
-                    if (canMove(elevation,testElevation))
-                    {
-                        //Console.WriteLine($"Distance to {testPos} is {distance+1}");
-                        distances[testPos] = distance + 1;
-                        positions.Enqueue(testPos);
-                    }
+                    //Console.WriteLine($"Distance to {testPos} is {distance+1}");
+                    distances[testPos] = distance + 1;
+                    positions.Enqueue(testPos);
                 }
             }
         }
