@@ -2,11 +2,20 @@
 
 public class Day12 : ISolver
 {
-    public (string, string) ExpectedResult => ("497", "");
+    public (string, string) ExpectedResult => ("497", "492");
 
     public (string, string) Solve(string[] input)
     {
-        return ($"{Part1(input)}", $"{Part2(input)}");
+        var grid = ParseToGrid(input);
+        var startPos = grid.AllPositions().First(p => grid[p] == 'S');
+        var endPos = grid.AllPositions().First(p => grid[p] == 'E');
+        grid[startPos] = 'a';
+        grid[endPos] = 'z';
+
+        var part1 = Part1(grid, startPos, p => p == endPos, (elevation, testElevation) => elevation + 1 >= testElevation);
+        var part2 = Part1(grid, endPos, p => grid[p] == 'a', (elevation, testElevation) => testElevation + 1 >= elevation);
+
+        return ($"{part1}", $"{part2}");
     }
 
     public static Grid<char> ParseToGrid(string[] input)
@@ -20,23 +29,21 @@ public class Day12 : ISolver
         return grid;
     }
 
-    long Part1(string[] input)
+    long Part1(Grid<char> grid, Coord startPos, Func<Coord,bool> endTest, Func<int,int,bool> canMove)
     {
-        var grid = ParseToGrid(input);
-        var startPos = grid.AllPositions().First(p => grid[p] == 'S');
-        var endPos = grid.AllPositions().First(p => grid[p] == 'E');
         var distances = new Dictionary<Coord, int>();
-        grid[startPos] = 'a';
-        grid[endPos] = 'z';
+
         var positions = new Queue<Coord>();
         positions.Enqueue(startPos);
         distances.Add(startPos, 0);
         var directions = new Coord[] { (0, 1), (1, 0), (0, -1), (-1, 0) };
-        while(positions.TryDequeue(out var pos))
+        Console.WriteLine($"START AT {startPos}");
+
+        while (positions.TryDequeue(out var pos))
         {
             var elevation = grid[pos];
             var distance = distances[pos];
-            if (pos == endPos)
+            if (endTest(pos))
             {
                 return distance;
             }
@@ -48,16 +55,12 @@ public class Day12 : ISolver
                 if (grid.IsInGrid(testPos) && !distances.ContainsKey(testPos) )
                 {
                     var testElevation = grid[testPos];
-                    if (elevation + 1 >= testElevation)
+                    if (canMove(elevation,testElevation))
                     {
                         Console.WriteLine($"Distance to {testPos} is {distance+1}");
                         distances[testPos] = distance + 1;
                         positions.Enqueue(testPos);
                     }
-                }
-                else
-                {
-                    Console.WriteLine($"ignore {testPos}");
                 }
             }
         }

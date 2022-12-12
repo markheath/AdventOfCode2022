@@ -17,11 +17,11 @@ acctuvwj
 abdefghi".Split("\r\n");
         var solver = new Day12();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("31", ""), solution);
+        Assert.AreEqual(("31", "29"), solution);
     }
 
     [Test]
-    public void Day132Part2TestInput()
+    public void Day12Part2TestInput()
     {
         var testInput = @"".Split("\r\n");
         var solver = new Day12();
