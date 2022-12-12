@@ -6,7 +6,7 @@ public class Day12 : ISolver
 
     public (string, string) Solve(string[] input)
     {
-        var grid = ParseToGrid(input);
+        var grid = Grid<char>.ParseToGrid(input, c=> c);
         var startPos = grid.AllPositions().First(p => grid[p] == 'S');
         var endPos = grid.AllPositions().First(p => grid[p] == 'E');
         grid[startPos] = 'a';
@@ -16,17 +16,6 @@ public class Day12 : ISolver
         var part2 = FindShortestDistance(grid, endPos, p => grid[p] == 'a', (elevation, testElevation) => testElevation + 1 >= elevation);
 
         return ($"{part1}", $"{part2}");
-    }
-
-    public static Grid<char> ParseToGrid(string[] input)
-    {
-        var grid = new Grid<char>(input[0].Length, input.Length);
-        for (var y = 0; y < input.Length; y++)
-        {
-            for (var x = 0; x < input[y].Length; x++)
-                grid[(x, y)] = input[y][x];
-        }
-        return grid;
     }
 
     long FindShortestDistance(Grid<char> grid, Coord startPos, Func<Coord,bool> endTest, Func<int,int,bool> canMove)

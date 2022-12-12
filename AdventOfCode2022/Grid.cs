@@ -1,19 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace AdventOfCode2022;
 
 public class Grid<T>
 {
     // for those cases where the grid is single digit numbers
-    public static Grid<int> ParseToGrid(string[] input)
+    public static Grid<T> ParseToGrid(string[] input, Func<char,T> selector)
     {
-        var grid = new Grid<int>(input[0].Length, input.Length);
+        var grid = new Grid<T>(input[0].Length, input.Length);
         for (var y = 0; y < input.Length; y++)
         {
             for (var x = 0; x < input[y].Length; x++)
-                grid[(x, y)] = input[y][x] - '0';
+                grid[(x, y)] = selector(input[y][x]);
         }
         return grid;
     }

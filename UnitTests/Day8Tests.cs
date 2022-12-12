@@ -1,4 +1,3 @@
-using System.Linq;
 using AdventOfCode2022;
 using NUnit.Framework;
 
@@ -14,7 +13,7 @@ public class Day8Tests
 35390";
 
     [Test]
-    public void Day8Solution()
+    public void Day8TestInput()
     {
         var testInput = TestInput.Split("\r\n");
         var solver = new Day8();

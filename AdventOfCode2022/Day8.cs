@@ -10,7 +10,7 @@ public class Day8 : ISolver
 
     public (string, string) Solve(string[] input)
     {
-        var g = Grid<int>.ParseToGrid(input);        
+        var g = Grid<int>.ParseToGrid(input, c => c - '0');        
         return ($"{Part1(g)}", $"{Part2(g)}");
     }
 
