@@ -61,14 +61,9 @@ public class Grid<T>
         }
     }
 
-    private readonly IEnumerable<Coord> horizontalNeighbours = new[] { new Coord(-1, 0), new Coord(1, 0), new Coord(0, -1), new Coord(0, 1) };
-    private readonly IEnumerable<Coord> diagonalNeigbours = new[] { new Coord(-1, -1), new Coord(1, 1), new Coord(1, -1), new Coord(-1, 1) };
-    
     public IEnumerable<Coord> Neighbours(Coord p, bool includeDiagonals = false)
     {
-        var neighbours = includeDiagonals ? horizontalNeighbours.Concat(diagonalNeigbours) : horizontalNeighbours;
-
-        return neighbours.Select(n => p + n).Where(IsInGrid);
+        return p.Neighbours(includeDiagonals).Select(n => p + n).Where(IsInGrid);
     }
 
     public override string ToString()

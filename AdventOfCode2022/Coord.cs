@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AdventOfCode2022;
@@ -46,6 +44,15 @@ public struct Coord : IEnumerable<int>, IEquatable<Coord>
         return !a.Equals(b);
     }
 
+    private readonly IEnumerable<Coord> horizontalNeighbours = new[] { new Coord(-1, 0), new Coord(1, 0), new Coord(0, -1), new Coord(0, 1) };
+    private readonly IEnumerable<Coord> diagonalNeigbours = new[] { new Coord(-1, -1), new Coord(1, 1), new Coord(1, -1), new Coord(-1, 1) };
+
+    public IEnumerable<Coord> Neighbours(bool includeDiagonals = false)
+    {
+        var neighbours = includeDiagonals ? horizontalNeighbours.Concat(diagonalNeigbours) : horizontalNeighbours;
+        var p = this;
+        return neighbours.Select(n => p + n);
+    }
 
     public override bool Equals(object? other) =>
         other is Coord c
