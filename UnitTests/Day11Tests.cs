@@ -1,4 +1,3 @@
-using System.Linq;
 using AdventOfCode2022;
 using NUnit.Framework;
 
@@ -8,7 +7,7 @@ public class Day11Tests
 {
 
     [Test]
-    public void Day11Part1TestInput()
+    public void Day11TestInput()
     {
         var testInput = @"Monkey 0:
   Starting items: 79, 98
@@ -40,15 +39,6 @@ Monkey 3:
         var solver = new Day11();
         var solution = solver.Solve(testInput);
         Assert.AreEqual(("10605", "2713310158"), solution);
-    }
-
-    [Test]
-    public void Day11Part2TestInput()
-    {
-        var testInput = @"".Split("\r\n");
-        var solver = new Day11();
-        var solution = solver.Solve(testInput);
-        Assert.AreEqual(@"", solution);
     }
 
 }

@@ -12,8 +12,8 @@ public class Day12 : ISolver
         grid[startPos] = 'a';
         grid[endPos] = 'z';
 
-        var part1 = Part1(grid, startPos, p => p == endPos, (elevation, testElevation) => elevation + 1 >= testElevation);
-        var part2 = Part1(grid, endPos, p => grid[p] == 'a', (elevation, testElevation) => testElevation + 1 >= elevation);
+        var part1 = FindShortestDistance(grid, startPos, p => p == endPos, (elevation, testElevation) => elevation + 1 >= testElevation);
+        var part2 = FindShortestDistance(grid, endPos, p => grid[p] == 'a', (elevation, testElevation) => testElevation + 1 >= elevation);
 
         return ($"{part1}", $"{part2}");
     }
@@ -29,7 +29,7 @@ public class Day12 : ISolver
         return grid;
     }
 
-    long Part1(Grid<char> grid, Coord startPos, Func<Coord,bool> endTest, Func<int,int,bool> canMove)
+    long FindShortestDistance(Grid<char> grid, Coord startPos, Func<Coord,bool> endTest, Func<int,int,bool> canMove)
     {
         var distances = new Dictionary<Coord, int>();
 
@@ -37,7 +37,7 @@ public class Day12 : ISolver
         positions.Enqueue(startPos);
         distances.Add(startPos, 0);
         var directions = new Coord[] { (0, 1), (1, 0), (0, -1), (-1, 0) };
-        Console.WriteLine($"START AT {startPos}");
+        //Console.WriteLine($"START AT {startPos}");
 
         while (positions.TryDequeue(out var pos))
         {
@@ -57,7 +57,7 @@ public class Day12 : ISolver
                     var testElevation = grid[testPos];
                     if (canMove(elevation,testElevation))
                     {
-                        Console.WriteLine($"Distance to {testPos} is {distance+1}");
+                        //Console.WriteLine($"Distance to {testPos} is {distance+1}");
                         distances[testPos] = distance + 1;
                         positions.Enqueue(testPos);
                     }
@@ -66,6 +66,5 @@ public class Day12 : ISolver
         }
         throw new InvalidOperationException("No route to end");
     }
-    long Part2(IEnumerable<string> input) => 0;
 
 }
