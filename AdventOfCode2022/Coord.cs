@@ -37,6 +37,16 @@ public struct Coord : IEnumerable<int>, IEquatable<Coord>
         return new Coord(a.x + b.x, a.y + b.y);
     }
 
+    public static bool operator ==(Coord a, Coord b)
+    {
+        return a.Equals(b);
+    }
+    public static bool operator !=(Coord a, Coord b)
+    {
+        return !a.Equals(b);
+    }
+
+
     public override bool Equals(object? other) =>
         other is Coord c
             && c.x.Equals(x)
