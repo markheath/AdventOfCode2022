@@ -60,7 +60,7 @@ public class Day13Tests
         var solver = new Day13();
         var p = solver.Parse("[1,1,3,10,1]");
         Assert.AreEqual(5, p.List.Count);
-        Assert.AreEqual(new List<int>() { 1,1,3,10,1}, p.List.Cast<IntPacketItem>().Select(n => n.Number));
+        Assert.AreEqual(new List<int>() { 1,1,3,10,1}, p.List.Select(n => n.Number));
     }
 
     [Test]
@@ -70,8 +70,8 @@ public class Day13Tests
         var solver = new Day13();
         var p = solver.Parse("[[1],[2,3,4]]");
         Assert.AreEqual(2, p.List.Count);
-        Assert.AreEqual(new List<int>() { 1, }, ((ListPacketItem)p.List[0]).List.Cast<IntPacketItem>().Select(n => n.Number));
-        Assert.AreEqual(new List<int>() { 2,3,4 }, ((ListPacketItem)p.List[1]).List.Cast<IntPacketItem>().Select(n => n.Number));
+        Assert.AreEqual(new List<int>() { 1, }, p.List[0].List.Select(n => n.Number));
+        Assert.AreEqual(new List<int>() { 2,3,4 }, p.List[1].List.Select(n => n.Number));
     }
 
     [Test]
@@ -81,9 +81,9 @@ public class Day13Tests
         var solver = new Day13();
         var p = solver.Parse("[[[]]]");
         Assert.AreEqual(1, p.List.Count);
-        var firstChild = (ListPacketItem)p.List[0];
+        var firstChild = p.List[0];
         Assert.AreEqual(1, firstChild.List.Count);
-        var secondChild = (ListPacketItem)firstChild.List[0];
+        var secondChild = firstChild.List[0];
         Assert.AreEqual(0, secondChild.List.Count);
     }
 

@@ -13,109 +13,33 @@ public class Day13 : ISolver
         return ($"{Part1(input)}", $"{Part2(input)}");
     }
 
-    public abstract class PacketItem : IComparable<PacketItem>
+    public class PacketItem : IComparable<PacketItem>
     {
-        public abstract int CompareTo(PacketItem? other);
-    }
-    public class IntPacketItem : PacketItem
-    {
-        public IntPacketItem(string number)
+        private int number;
+        public int Number { get { if (!IsNumber) throw new InvalidOperationException("Not a number"); return number; }  }
+        private bool IsNumber { get { return childPackets == null; } }
+        private readonly List<PacketItem>? childPackets;
+        public IReadOnlyList<PacketItem> List {  get { if (childPackets == null) throw new InvalidCastException("Not a list"); return childPackets; } }
+        
+        public void Add(PacketItem item) { childPackets.Add(item); }
+
+        public PacketItem()
         {
-            Number = int.Parse(number);
+            childPackets = new List<PacketItem>();
         }
 
-        public int Number { get; }
-
-        public override int CompareTo(PacketItem? other)
+        public PacketItem(string numberValue)
         {
-            throw new NotImplementedException("Not needed - ints never compared directly");
+            number = int.Parse(numberValue);
         }
 
         public override string ToString()
         {
-            return Number.ToString();
-        }
-    }
-    public class ListPacketItem : PacketItem
-    {
-        public ListPacketItem()
-        {
-            List = new List<PacketItem>();
-        }
+            if (IsNumber) return number.ToString();
 
-        public List<PacketItem> List { get;  }
-
-        public void Add(PacketItem item) { List.Add(item); }
-
-        public override int CompareTo(PacketItem? other) // right order is -1, wrong order is 1 
-        {
-            if (other is not ListPacketItem otherList) throw new InvalidOperationException("Only supporting compare with lists");
-
-            for(var index = 0; index < this.List.Count; index++)
-            {
-                var left = this.List[index];
-                // If the right list runs out of items first, the inputs are not in the right order.
-                if (index >= otherList.List.Count) return 1;
-                var right = otherList.List[index];
-                //Console.WriteLine($"  - Compare {left} vs {right}");
-
-                if (left is IntPacketItem leftInt && right is IntPacketItem rightInt)
-                {
-                    // If both values are integers, the lower integer should come first.
-                    // If the left integer is lower than the right integer, the inputs are in the right order.
-
-                    if (leftInt.Number < rightInt.Number)
-                    {
-                        //Console.WriteLine($"  - Left side is smaller, so inputs are in the right order\r\n");
-                        return -1;
-                    }
-                    // If the left integer is higher than the right integer, the inputs are not in the right order.
-                    if (leftInt.Number > rightInt.Number)
-                    {
-                        //Console.WriteLine($"  - Right side is smaller, so inputs are not in the right order\r\n");
-                        return 1;
-                    }
-                    // Otherwise, the inputs are the same integer; continue checking the next part of the input
-
-                }
-                else if (left is ListPacketItem leftList && right is ListPacketItem rightList)
-                {
-                    // If both values are lists, compare the first value of each list, then the second value, and so on.
-                    var result = leftList.CompareTo(rightList);
-                    if (result != 0) return result;
-                }
-                else 
-                {
-                    // If exactly one value is an integer, convert the integer to a list which contains that integer as its only value, then retry the comparison.
-                    if (left is IntPacketItem) // right must be a list packet
-                    {
-                        var leftList2 = new ListPacketItem();
-                        leftList2.Add(left);
-                        var result = leftList2.CompareTo((ListPacketItem)right);
-                        if (result != 0) return result;
-                    }
-                    else // left is a list, right is a number
-                    {
-                        var rightList2 = new ListPacketItem();
-                        rightList2.Add((IntPacketItem)right);
-                        var result = ((ListPacketItem)left).CompareTo(rightList2);
-                        if (result != 0) return result;
-                    }
-                }
-                
-            }
-            if (this.List.Count == otherList.List.Count) return 0; // lists can be a tie
-
-            // If the left list runs out of items first, the inputs are in the right order.
-            //Console.WriteLine("Left side ran out of items, so inputs are in the right order");
-            return -1; 
-        }
-
-        public override string ToString()
-        {
             var sb = new StringBuilder();
             sb.Append("[");
-            foreach(var item in List)
+            foreach (var item in List)
             {
                 sb.Append(item.ToString());
                 sb.Append(",");
@@ -124,18 +48,82 @@ public class Day13 : ISolver
             sb.Append("]");
             return sb.ToString();
         }
+
+        public int CompareTo(PacketItem? other) // right order is -1, wrong order is 1 
+        {
+            if (other.IsNumber) throw new InvalidOperationException("Only supporting compare with lists");
+
+            for (var index = 0; index < this.List.Count; index++)
+            {
+                var left = this.List[index];
+                // If the right list runs out of items first, the inputs are not in the right order.
+                if (index >= other.List.Count) return 1;
+                var right = other.List[index];
+                //Console.WriteLine($"  - Compare {left} vs {right}");
+
+                if (left.IsNumber && right.IsNumber)
+                {
+                    // If both values are integers, the lower integer should come first.
+                    // If the left integer is lower than the right integer, the inputs are in the right order.
+
+                    if (left.Number < right.Number)
+                    {
+                        //Console.WriteLine($"  - Left side is smaller, so inputs are in the right order\r\n");
+                        return -1;
+                    }
+                    // If the left integer is higher than the right integer, the inputs are not in the right order.
+                    if (left.Number > right.Number)
+                    {
+                        //Console.WriteLine($"  - Right side is smaller, so inputs are not in the right order\r\n");
+                        return 1;
+                    }
+                    // Otherwise, the inputs are the same integer; continue checking the next part of the input
+
+                }
+                else if (!left.IsNumber && !right.IsNumber)
+                {
+                    // If both values are lists, compare the first value of each list, then the second value, and so on.
+                    var result = left.CompareTo(right);
+                    if (result != 0) return result;
+                }
+                else
+                {
+                    // If exactly one value is an integer, convert the integer to a list which contains that integer as its only value, then retry the comparison.
+                    if (left.IsNumber) // right must be a list packet
+                    {
+                        var leftList2 = new PacketItem();
+                        leftList2.Add(left);
+                        var result = leftList2.CompareTo(right);
+                        if (result != 0) return result;
+                    }
+                    else // left is a list, right is a number
+                    {
+                        var rightList2 = new PacketItem();
+                        rightList2.Add(right);
+                        var result = left.CompareTo(rightList2);
+                        if (result != 0) return result;
+                    }
+                }
+
+            }
+            if (this.List.Count == other.List.Count) return 0; // lists can be a tie
+
+            // If the left list runs out of items first, the inputs are in the right order.
+            //Console.WriteLine("Left side ran out of items, so inputs are in the right order");
+            return -1;
+        }
     }
 
-    public ListPacketItem Parse(string s)
+    public PacketItem Parse(string s)
     {
-        ListPacketItem? topLevel = null;
-        var listStack = new Stack<ListPacketItem>();
+        PacketItem? topLevel = null;
+        var listStack = new Stack<PacketItem>();
         var currentNum = "";
         foreach(var c in s)
         {
             if (c == '[')
             {
-                var newList = new ListPacketItem();
+                var newList = new PacketItem();
                 if(topLevel == null) topLevel= newList;
                 else listStack.Peek().Add(newList);
                 listStack.Push(newList);
@@ -144,7 +132,7 @@ public class Day13 : ISolver
             {
                 if (currentNum.Length > 0)
                 {
-                    listStack.Peek().Add(new IntPacketItem(currentNum));
+                    listStack.Peek().Add(new PacketItem(currentNum));
                     currentNum = "";
                 }
                 if (c == ']')
