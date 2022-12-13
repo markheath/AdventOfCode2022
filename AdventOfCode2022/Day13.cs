@@ -47,7 +47,7 @@ public class Day13 : ISolver
 
         public void Add(PacketItem item) { List.Add(item); }
 
-        public override int CompareTo(PacketItem? other) // right order is 1 (true), wrong order is -1 (false)
+        public override int CompareTo(PacketItem? other) // right order is -1, wrong order is 1 
         {
             if (other is not ListPacketItem otherList) throw new InvalidOperationException("Only supporting compare with lists");
 
@@ -55,7 +55,7 @@ public class Day13 : ISolver
             {
                 var left = this.List[index];
                 // If the right list runs out of items first, the inputs are not in the right order.
-                if (index >= otherList.List.Count) return -1;
+                if (index >= otherList.List.Count) return 1;
                 var right = otherList.List[index];
                 //Console.WriteLine($"  - Compare {left} vs {right}");
 
@@ -67,13 +67,13 @@ public class Day13 : ISolver
                     if (leftInt.Number < rightInt.Number)
                     {
                         //Console.WriteLine($"  - Left side is smaller, so inputs are in the right order\r\n");
-                        return 1;
+                        return -1;
                     }
                     // If the left integer is higher than the right integer, the inputs are not in the right order.
                     if (leftInt.Number > rightInt.Number)
                     {
                         //Console.WriteLine($"  - Right side is smaller, so inputs are not in the right order\r\n");
-                        return -1;
+                        return 1;
                     }
                     // Otherwise, the inputs are the same integer; continue checking the next part of the input
 
@@ -108,7 +108,7 @@ public class Day13 : ISolver
 
             // If the left list runs out of items first, the inputs are in the right order.
             //Console.WriteLine("Left side ran out of items, so inputs are in the right order");
-            return 1; 
+            return -1; 
         }
 
         public override string ToString()
@@ -164,7 +164,7 @@ public class Day13 : ISolver
     long Part1(IEnumerable<string> input)
     {
         return input.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = Parse(chunk[0]), Second = Parse(chunk[1]) })
-            .Where(p => p.First.CompareTo(p.Second) == 1).Sum(p => p.Index);
+            .Where(p => p.First.CompareTo(p.Second) == -1).Sum(p => p.Index);
     }
     long Part2(IEnumerable<string> input)
     {
@@ -173,7 +173,7 @@ public class Day13 : ISolver
         var divider2 = Parse("[[6]]");
         allPackets.Add(divider1);
         allPackets.Add(divider2);
-        allPackets.Sort(new Comparison<ListPacketItem>((a,b) => b.CompareTo(a)));
+        allPackets.Sort();
         return (allPackets.IndexOf(divider1) + 1) * (allPackets.IndexOf(divider2) + 1);
     }
 
