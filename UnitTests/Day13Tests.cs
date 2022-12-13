@@ -38,7 +38,7 @@ public class Day13Tests
         var testInput = TestInput.Split("\r\n");
         var solver = new Day13();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("13", "0"), solution);
+        Assert.AreEqual(("13", "140"), solution);
     }
 
     [Test]

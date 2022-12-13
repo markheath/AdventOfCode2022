@@ -4,7 +4,7 @@ namespace AdventOfCode2022;
 
 public class Day13 : ISolver
 {
-    public (string, string) ExpectedResult => ("4643", "");
+    public (string, string) ExpectedResult => ("4643", "21614");
 
 
 
@@ -62,7 +62,7 @@ public class Day13 : ISolver
                 // If the right list runs out of items first, the inputs are not in the right order.
                 if (index >= other.List.Count) return -1;
                 var right = other.List[index];
-                Console.WriteLine($"  - Compare {left} vs {right}");
+                //Console.WriteLine($"  - Compare {left} vs {right}");
 
                 if (left is IntPacketItem leftInt && right is IntPacketItem rightInt)
                 {
@@ -71,13 +71,13 @@ public class Day13 : ISolver
 
                     if (leftInt.Number < rightInt.Number)
                     {
-                        Console.WriteLine($"  - Left side is smaller, so inputs are in the right order\r\n");
+                        //Console.WriteLine($"  - Left side is smaller, so inputs are in the right order\r\n");
                         return 1;
                     }
                     // If the left integer is higher than the right integer, the inputs are not in the right order.
                     if (leftInt.Number > rightInt.Number)
                     {
-                        Console.WriteLine($"  - Right side is smaller, so inputs are not in the right order\r\n");
+                        //Console.WriteLine($"  - Right side is smaller, so inputs are not in the right order\r\n");
                         return -1;
                     }
                     // Otherwise, the inputs are the same integer; continue checking the next part of the input
@@ -112,7 +112,7 @@ public class Day13 : ISolver
             if (this.List.Count == other.List.Count) return 0; // lists can be a tie
 
             // If the left list runs out of items first, the inputs are in the right order.
-            Console.WriteLine("Left side ran out of items, so inputs are in the right order");
+            //Console.WriteLine("Left side ran out of items, so inputs are in the right order");
             return 1; 
         }
 
@@ -179,7 +179,13 @@ public class Day13 : ISolver
     }
     long Part2(IEnumerable<string> input)
     {
-        return 0;
+        var allPackets = input.Where(s => !String.IsNullOrEmpty(s)).Select(p => Parse(p)).ToList();
+        var divider1 = Parse("[[2]]");
+        var divider2 = Parse("[[6]]");
+        allPackets.Add(divider1);
+        allPackets.Add(divider2);
+        allPackets.Sort(new Comparison<ListPacketItem>((a,b) => b.Compare(a)));
+        return (allPackets.IndexOf(divider1) + 1) * (allPackets.IndexOf(divider2) + 1);
     }
 
 }
