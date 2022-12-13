@@ -10,18 +10,6 @@ public class Day13 : ISolver
 
     public (string, string) Solve(string[] input)
     {
-        /* testing the parser - seems fine
-        var pairs = input.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = Parse(chunk[0]), Second = Parse(chunk[1]) });
-        var sb = new StringBuilder();
-        foreach(var pair in pairs)
-        {
-            sb.AppendLine($"{pair.First}");
-            sb.AppendLine($"{pair.Second}");
-            sb.AppendLine();
-        }
-        File.WriteAllText(@"C:\Users\mheath\code\github\AdventOfCode2022\Input\Day13Parsed.txt", sb.ToString());*/
-
-
         return ($"{Part1(input)}", $"{Part2(input)}");
     }
 
@@ -45,14 +33,13 @@ public class Day13 : ISolver
     }
     public class ListPacketItem : PacketItem
     {
-        public ListPacketItem(ListPacketItem parent)
+        public ListPacketItem()
         {
             List = new List<PacketItem>();
-            Parent = parent;
         }
 
         public List<PacketItem> List { get;  }
-        public ListPacketItem? Parent { get; }
+
 
         public int Compare(ListPacketItem other) // right order is 1 (true), wrong order is -1 (false)
         {
@@ -94,14 +81,14 @@ public class Day13 : ISolver
                     // If exactly one value is an integer, convert the integer to a list which contains that integer as its only value, then retry the comparison.
                     if (left is IntPacketItem) // right must be a list packet
                     {
-                        var leftList2 = new ListPacketItem(null);
+                        var leftList2 = new ListPacketItem();
                         leftList2.List.Add(left);
                         var result = leftList2.Compare((ListPacketItem)right);
                         if (result != 0) return result;
                     }
                     else // left is a list, right is a number
                     {
-                        var rightList2 = new ListPacketItem(null);
+                        var rightList2 = new ListPacketItem();
                         rightList2.List.Add((IntPacketItem)right);
                         var result = ((ListPacketItem)left).Compare(rightList2);
                         if (result != 0) return result;
@@ -135,32 +122,32 @@ public class Day13 : ISolver
 
     public ListPacketItem Parse(string s)
     {
-
-        ListPacketItem parent = new ListPacketItem(null);
-        ListPacketItem current = parent;
+        var topLevel = new ListPacketItem();
+        Stack<ListPacketItem> listStack = new Stack<ListPacketItem>();
+        listStack.Push(topLevel);
         var currentNum = "";
         for(var n = 1; n < s.Length; n++)
         {
             if (s[n] == '[')
             {
-                var newList = new ListPacketItem(current);
-                current.List.Add(newList);
-                current = newList;
+                var newList = new ListPacketItem();
+                listStack.Peek().List.Add(newList);
+                listStack.Push(newList);
             }
             else if (s[n] == ']')
             {
                 if (currentNum.Length > 0)
                 {
-                    current.List.Add(new IntPacketItem(currentNum));
+                    listStack.Peek().List.Add(new IntPacketItem(currentNum));
                     currentNum = "";
                 }
-                current = current.Parent;
+                listStack.Pop();
             }
             else if (s[n] == ',')
             {
                 if (currentNum.Length > 0)
                 {
-                    current.List.Add(new IntPacketItem(currentNum));
+                    listStack.Peek().List.Add(new IntPacketItem(currentNum));
                     currentNum = "";
                 }
             }
@@ -169,7 +156,7 @@ public class Day13 : ISolver
                 currentNum += s[n];
             }
         }
-        return parent;
+        return topLevel;
     }
 
     long Part1(IEnumerable<string> input)
@@ -179,7 +166,7 @@ public class Day13 : ISolver
     }
     long Part2(IEnumerable<string> input)
     {
-        var allPackets = input.Where(s => !String.IsNullOrEmpty(s)).Select(p => Parse(p)).ToList();
+        var allPackets = input.Where(s => !String.IsNullOrEmpty(s)).Select(Parse).ToList();
         var divider1 = Parse("[[2]]");
         var divider2 = Parse("[[6]]");
         allPackets.Add(divider1);
