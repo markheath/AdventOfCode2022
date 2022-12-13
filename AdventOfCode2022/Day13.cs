@@ -122,19 +122,19 @@ public class Day13 : ISolver
 
     public ListPacketItem Parse(string s)
     {
-        var topLevel = new ListPacketItem();
-        Stack<ListPacketItem> listStack = new Stack<ListPacketItem>();
-        listStack.Push(topLevel);
+        ListPacketItem? topLevel = null;
+        var listStack = new Stack<ListPacketItem>();
         var currentNum = "";
-        for(var n = 1; n < s.Length; n++)
+        foreach(var c in s)
         {
-            if (s[n] == '[')
+            if (c == '[')
             {
                 var newList = new ListPacketItem();
-                listStack.Peek().List.Add(newList);
+                if(topLevel == null) topLevel= newList;
+                else listStack.Peek().List.Add(newList);
                 listStack.Push(newList);
             }
-            else if (s[n] == ']')
+            else if (c == ']')
             {
                 if (currentNum.Length > 0)
                 {
@@ -143,7 +143,7 @@ public class Day13 : ISolver
                 }
                 listStack.Pop();
             }
-            else if (s[n] == ',')
+            else if (c == ',')
             {
                 if (currentNum.Length > 0)
                 {
@@ -153,9 +153,10 @@ public class Day13 : ISolver
             }
             else
             {
-                currentNum += s[n];
+                currentNum += c;
             }
         }
+        if (topLevel == null) throw new InvalidOperationException("No packet found");
         return topLevel;
     }
 
