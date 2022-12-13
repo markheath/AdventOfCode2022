@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AdventOfCode2022;
 
-public struct Coord : IEnumerable<int>, IEquatable<Coord>
+public readonly struct Coord : IEnumerable<int>, IEquatable<Coord>
 {
     private readonly int x;
     private readonly int y;
@@ -39,13 +39,14 @@ public struct Coord : IEnumerable<int>, IEquatable<Coord>
     {
         return a.Equals(b);
     }
+
     public static bool operator !=(Coord a, Coord b)
     {
         return !a.Equals(b);
     }
 
-    private readonly IEnumerable<Coord> horizontalNeighbours = new[] { new Coord(-1, 0), new Coord(1, 0), new Coord(0, -1), new Coord(0, 1) };
-    private readonly IEnumerable<Coord> diagonalNeigbours = new[] { new Coord(-1, -1), new Coord(1, 1), new Coord(1, -1), new Coord(-1, 1) };
+    private static readonly IEnumerable<Coord> horizontalNeighbours = new[] { new Coord(-1, 0), new Coord(1, 0), new Coord(0, -1), new Coord(0, 1) };
+    private static readonly IEnumerable<Coord> diagonalNeigbours = new[] { new Coord(-1, -1), new Coord(1, 1), new Coord(1, -1), new Coord(-1, 1) };
 
     public IEnumerable<Coord> Neighbours(bool includeDiagonals = false)
     {
@@ -62,18 +63,9 @@ public struct Coord : IEnumerable<int>, IEquatable<Coord>
     // Implement IEquatable<T> https://stackoverflow.com/a/8952026/7532
     public bool Equals([AllowNull] Coord other) => x == other.x && y == other.y;
 
-
     public override int GetHashCode()
-    //            => HashHelpers.Combine(HashHelpers.Combine(HashHelpers.Combine(HashHelpers.RandomSeed, x), y), z);
     {
-        // based on Jon Skeet - hashcode of an int is just its value
-        unchecked // Overflow is fine, just wrap
-        {
-            int hash = 17;
-            hash = hash * 29 + x;
-            hash = hash * 29 + y;
-            return hash;
-        }
+        return HashCode.Combine(x, y);
     }
 
     public override string ToString() => $"({x},{y})";
@@ -85,4 +77,16 @@ public struct Coord : IEnumerable<int>, IEquatable<Coord>
     }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public Coord RotateClockwise(int degrees)
+    {
+        return degrees switch
+        {
+            0 => new Coord(x, y),
+            90 => new Coord(y, -x),
+            180 => new Coord(-x, -y),
+            270 => new Coord(-y, x),
+            _ => throw new NotImplementedException()
+        };
+    }
 }
