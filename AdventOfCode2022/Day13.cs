@@ -21,11 +21,16 @@ public class Day13 : ISolver
         private readonly List<PacketItem>? childPackets;
         public IReadOnlyList<PacketItem> List {  get { if (childPackets == null) throw new InvalidCastException("Not a list"); return childPackets; } }
         
-        public void Add(PacketItem item) { childPackets.Add(item); }
+        public void Add(PacketItem item) { if (childPackets == null) throw new InvalidCastException("Not a list"); childPackets.Add(item); }
 
         public PacketItem()
         {
             childPackets = new List<PacketItem>();
+        }
+
+        public PacketItem(PacketItem child) : this()
+        {
+            Add(child);
         }
 
         public PacketItem(string numberValue)
@@ -39,12 +44,7 @@ public class Day13 : ISolver
 
             var sb = new StringBuilder();
             sb.Append("[");
-            foreach (var item in List)
-            {
-                sb.Append(item.ToString());
-                sb.Append(",");
-            }
-            if (List.Count > 0) sb.Length--;
+            sb.Append(string.Join(',', List));
             sb.Append("]");
             return sb.ToString();
         }
@@ -91,16 +91,12 @@ public class Day13 : ISolver
                     // If exactly one value is an integer, convert the integer to a list which contains that integer as its only value, then retry the comparison.
                     if (left.IsNumber) // right must be a list packet
                     {
-                        var leftList2 = new PacketItem();
-                        leftList2.Add(left);
-                        var result = leftList2.CompareTo(right);
+                        var result = new PacketItem(left).CompareTo(right);
                         if (result != 0) return result;
                     }
                     else // left is a list, right is a number
                     {
-                        var rightList2 = new PacketItem();
-                        rightList2.Add(right);
-                        var result = left.CompareTo(rightList2);
+                        var result = left.CompareTo(new PacketItem(right));
                         if (result != 0) return result;
                     }
                 }

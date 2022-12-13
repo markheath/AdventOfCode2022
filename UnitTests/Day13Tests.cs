@@ -43,7 +43,6 @@ public class Day13Tests
 
     [Test]
     public void Day13ComparisonsCorrect()
-
     {
         var testInput = TestInput.Split("\r\n");
         var solver = new Day13();
@@ -52,10 +51,8 @@ public class Day13Tests
         Assert.AreEqual(new[] { true,true, false,true,false,true,false,false }, orders);
     }
 
-
     [Test]
     public void Day13ParseBasicList()
-
     {
         var solver = new Day13();
         var p = solver.Parse("[1,1,3,10,1]");
@@ -65,18 +62,18 @@ public class Day13Tests
 
     [Test]
     public void Day13ParseNestedList()
-
     {
         var solver = new Day13();
-        var p = solver.Parse("[[1],[2,3,4]]");
+        var input = "[[1],[2,3,4]]";
+        var p = solver.Parse(input);
         Assert.AreEqual(2, p.List.Count);
         Assert.AreEqual(new List<int>() { 1, }, p.List[0].List.Select(n => n.Number));
         Assert.AreEqual(new List<int>() { 2,3,4 }, p.List[1].List.Select(n => n.Number));
+        Assert.AreEqual(input, p.ToString());
     }
 
     [Test]
     public void Day13ParseEmptyList()
-
     {
         var solver = new Day13();
         var p = solver.Parse("[[[]]]");
@@ -86,7 +83,4 @@ public class Day13Tests
         var secondChild = firstChild.List[0];
         Assert.AreEqual(0, secondChild.List.Count);
     }
-
-
-
 }
