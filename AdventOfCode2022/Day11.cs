@@ -38,7 +38,6 @@ public class Day11 : ISolver
         var part2 = monkeys.Select(m => (long)m.InspectCount).OrderDescending().Take(2).Aggregate((a, b) => a * b);
 
         return ($"{part1}", $"{part2}");
-
     }
 
     private static void DoRound(List<Monkey> monkeys, Func<BigInteger,BigInteger> worryReducer)

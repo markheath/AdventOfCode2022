@@ -9,7 +9,6 @@ public class Day2 : ISolver
     {
         Winners = new Dictionary<char, char> { { 'A', 'C' }, { 'B', 'A' }, { 'C', 'B' } };
         Losers = Winners.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
-
     }
     public (string, string) ExpectedResult => ("11449", "13187");
 

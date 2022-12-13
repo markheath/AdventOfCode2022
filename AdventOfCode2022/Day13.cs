@@ -41,7 +41,7 @@ public class Day13 : ISolver
 
         private static (PacketItem, int) Parse(string s, int startPos)
         {
-            PacketItem list = new PacketItem();
+            PacketItem list = new();
             var currentNum = "";
             for (var n = startPos; n < s.Length; n++)
             {
@@ -131,7 +131,7 @@ public class Day13 : ISolver
                 }
 
             }
-            if (this.List.Count == other.List.Count) return 0; // lists can be a tie
+            if (List.Count == other.List.Count) return 0; // lists can be a tie
 
             // If the left list runs out of items first, the inputs are in the right order.
             //Console.WriteLine("Left side ran out of items, so inputs are in the right order");

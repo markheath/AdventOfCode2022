@@ -15,7 +15,7 @@ public class Day9 : ISolver
         var tailVisited = new HashSet<Coord> { rope.Last() };
         foreach (var inst in input)
         {
-            var dir = inst[0] switch { 'R' => (1, 0), 'L' => (-1, 0), 'U' => (0, 1), 'D' => (0, -1) };
+            var dir = inst[0] switch { 'R' => (1, 0), 'L' => (-1, 0), 'U' => (0, 1), 'D' => (0, -1), _ => throw new NotImplementedException() };
             var count = int.Parse(inst[2..]);
             for(var step = 0; step < count; step++)
             {

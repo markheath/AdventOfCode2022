@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using SuperLinq;
 
 namespace AdventOfCode2022;
 
@@ -38,6 +37,7 @@ public class Day10 : ISolver
         var targets = new[] { 20, 60, 100, 140, 180, 220 };
         return targets.Select(t => output[t - 1] * t).Sum();
     }
+
     public string Part2(IEnumerable<string> input)
     {
         var sb = new StringBuilder();
