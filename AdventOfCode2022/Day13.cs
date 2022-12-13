@@ -41,17 +41,12 @@ public class Day13 : ISolver
         public override string ToString()
         {
             if (IsNumber) return number.ToString();
-
-            var sb = new StringBuilder();
-            sb.Append("[");
-            sb.Append(string.Join(',', List));
-            sb.Append("]");
-            return sb.ToString();
+            return $"[{string.Join(',', List)}]";
         }
 
         public int CompareTo(PacketItem? other) // right order is -1, wrong order is 1 
         {
-            if (other.IsNumber) throw new InvalidOperationException("Only supporting compare with lists");
+            if (other == null || other.IsNumber) throw new InvalidOperationException("Only supporting compare with lists");
 
             for (var index = 0; index < this.List.Count; index++)
             {
