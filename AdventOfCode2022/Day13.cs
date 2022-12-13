@@ -13,10 +13,10 @@ public class Day13 : ISolver
         return ($"{Part1(input)}", $"{Part2(input)}");
     }
 
-    public class PacketItem 
+    public abstract class PacketItem : IComparable<PacketItem>
     {
-
-    };
+        public abstract int CompareTo(PacketItem? other);
+    }
     public class IntPacketItem : PacketItem
     {
         public IntPacketItem(string number)
@@ -25,6 +25,11 @@ public class Day13 : ISolver
         }
 
         public int Number { get; }
+
+        public override int CompareTo(PacketItem? other)
+        {
+            throw new NotImplementedException("Not needed - ints never compared directly");
+        }
 
         public override string ToString()
         {
@@ -42,14 +47,16 @@ public class Day13 : ISolver
 
         public void Add(PacketItem item) { List.Add(item); }
 
-        public int Compare(ListPacketItem other) // right order is 1 (true), wrong order is -1 (false)
+        public override int CompareTo(PacketItem? other) // right order is 1 (true), wrong order is -1 (false)
         {
+            if (other is not ListPacketItem otherList) throw new InvalidOperationException("Only supporting compare with lists");
+
             for(var index = 0; index < this.List.Count; index++)
             {
                 var left = this.List[index];
                 // If the right list runs out of items first, the inputs are not in the right order.
-                if (index >= other.List.Count) return -1;
-                var right = other.List[index];
+                if (index >= otherList.List.Count) return -1;
+                var right = otherList.List[index];
                 //Console.WriteLine($"  - Compare {left} vs {right}");
 
                 if (left is IntPacketItem leftInt && right is IntPacketItem rightInt)
@@ -74,7 +81,7 @@ public class Day13 : ISolver
                 else if (left is ListPacketItem leftList && right is ListPacketItem rightList)
                 {
                     // If both values are lists, compare the first value of each list, then the second value, and so on.
-                    var result = leftList.Compare(rightList);
+                    var result = leftList.CompareTo(rightList);
                     if (result != 0) return result;
                 }
                 else 
@@ -84,20 +91,20 @@ public class Day13 : ISolver
                     {
                         var leftList2 = new ListPacketItem();
                         leftList2.Add(left);
-                        var result = leftList2.Compare((ListPacketItem)right);
+                        var result = leftList2.CompareTo((ListPacketItem)right);
                         if (result != 0) return result;
                     }
                     else // left is a list, right is a number
                     {
                         var rightList2 = new ListPacketItem();
                         rightList2.Add((IntPacketItem)right);
-                        var result = ((ListPacketItem)left).Compare(rightList2);
+                        var result = ((ListPacketItem)left).CompareTo(rightList2);
                         if (result != 0) return result;
                     }
                 }
                 
             }
-            if (this.List.Count == other.List.Count) return 0; // lists can be a tie
+            if (this.List.Count == otherList.List.Count) return 0; // lists can be a tie
 
             // If the left list runs out of items first, the inputs are in the right order.
             //Console.WriteLine("Left side ran out of items, so inputs are in the right order");
@@ -157,7 +164,7 @@ public class Day13 : ISolver
     long Part1(IEnumerable<string> input)
     {
         return input.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = Parse(chunk[0]), Second = Parse(chunk[1]) })
-            .Where(p => p.First.Compare(p.Second) == 1).Sum(p => p.Index);
+            .Where(p => p.First.CompareTo(p.Second) == 1).Sum(p => p.Index);
     }
     long Part2(IEnumerable<string> input)
     {
@@ -166,7 +173,7 @@ public class Day13 : ISolver
         var divider2 = Parse("[[6]]");
         allPackets.Add(divider1);
         allPackets.Add(divider2);
-        allPackets.Sort(new Comparison<ListPacketItem>((a,b) => b.Compare(a)));
+        allPackets.Sort(new Comparison<ListPacketItem>((a,b) => b.CompareTo(a)));
         return (allPackets.IndexOf(divider1) + 1) * (allPackets.IndexOf(divider2) + 1);
     }
 

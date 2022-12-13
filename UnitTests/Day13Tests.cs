@@ -48,7 +48,7 @@ public class Day13Tests
         var testInput = TestInput.Split("\r\n");
         var solver = new Day13();
         var orders = testInput.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = solver.Parse(chunk[0]), Second = solver.Parse(chunk[1]) })
-            .Select(p => p.First.Compare(p.Second) == 1);
+            .Select(p => p.First.CompareTo(p.Second) == 1);
         Assert.AreEqual(new[] { true,true, false,true,false,true,false,false }, orders);
     }
 
