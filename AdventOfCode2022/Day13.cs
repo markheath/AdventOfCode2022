@@ -40,6 +40,7 @@ public class Day13 : ISolver
 
         public List<PacketItem> List { get;  }
 
+        public void Add(PacketItem item) { List.Add(item); }
 
         public int Compare(ListPacketItem other) // right order is 1 (true), wrong order is -1 (false)
         {
@@ -82,14 +83,14 @@ public class Day13 : ISolver
                     if (left is IntPacketItem) // right must be a list packet
                     {
                         var leftList2 = new ListPacketItem();
-                        leftList2.List.Add(left);
+                        leftList2.Add(left);
                         var result = leftList2.Compare((ListPacketItem)right);
                         if (result != 0) return result;
                     }
                     else // left is a list, right is a number
                     {
                         var rightList2 = new ListPacketItem();
-                        rightList2.List.Add((IntPacketItem)right);
+                        rightList2.Add((IntPacketItem)right);
                         var result = ((ListPacketItem)left).Compare(rightList2);
                         if (result != 0) return result;
                     }
@@ -116,9 +117,7 @@ public class Day13 : ISolver
             sb.Append("]");
             return sb.ToString();
         }
-
     }
-
 
     public ListPacketItem Parse(string s)
     {
@@ -131,24 +130,19 @@ public class Day13 : ISolver
             {
                 var newList = new ListPacketItem();
                 if(topLevel == null) topLevel= newList;
-                else listStack.Peek().List.Add(newList);
+                else listStack.Peek().Add(newList);
                 listStack.Push(newList);
             }
-            else if (c == ']')
+            else if (c == ']' || c == ',')
             {
                 if (currentNum.Length > 0)
                 {
-                    listStack.Peek().List.Add(new IntPacketItem(currentNum));
+                    listStack.Peek().Add(new IntPacketItem(currentNum));
                     currentNum = "";
                 }
-                listStack.Pop();
-            }
-            else if (c == ',')
-            {
-                if (currentNum.Length > 0)
+                if (c == ']')
                 {
-                    listStack.Peek().List.Add(new IntPacketItem(currentNum));
-                    currentNum = "";
+                    listStack.Pop();
                 }
             }
             else
