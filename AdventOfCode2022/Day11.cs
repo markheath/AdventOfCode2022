@@ -9,7 +9,7 @@ public class Day11 : ISolver
     {
         public int InspectCount { get; set; }
         public List<BigInteger> Items { get; } = new List<BigInteger>();
-        public Func<BigInteger, BigInteger> Operation { get; set; }
+        public Func<BigInteger, BigInteger> Operation { get; set; } = n => n;
         public int DivisibleBy { get; set; }
         public int TrueTarget { get; set; }
         public int FalseTarget { get; set; }
@@ -72,7 +72,7 @@ public class Day11 : ISolver
         foreach (var x in input.Chunk(7))
         {
             var m = new Monkey();
-            m.Items.AddRange(x[1].Split(' ', StringSplitOptions.RemoveEmptyEntries).Skip(2).Select(n => (BigInteger)int.Parse(n.Trim(','))));
+            m.Items.AddRange(regex.Matches(x[1]).Select(m => (BigInteger)int.Parse(m.Value)));
             var op = x[2].Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (op[4] == "*")
                 m.Operation = op[5] == "old" ? (x => x * x) : (x => x * int.Parse(op[5]));
@@ -81,16 +81,12 @@ public class Day11 : ISolver
 
 
             m.DivisibleBy = int.Parse(regex.Match(x[3]).Value);
-            m.TrueTarget = int.Parse(x[4].Split(' ', StringSplitOptions.RemoveEmptyEntries).Last().Trim());
-            m.FalseTarget = int.Parse(x[5].Split(' ', StringSplitOptions.RemoveEmptyEntries).Last().Trim());
+            m.TrueTarget = int.Parse(regex.Match(x[4]).Value);
+            m.FalseTarget = int.Parse(regex.Match(x[5]).Value);
 
             monkeys.Add(m);
         }
 
         return monkeys;
     }
-
-    long Part1(IEnumerable<string> input) => throw new NotImplementedException();
-    long Part2(IEnumerable<string> input) => throw new NotImplementedException();
-
 }
