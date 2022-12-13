@@ -45,8 +45,7 @@ public class Day13Tests
     public void Day13ComparisonsCorrect()
     {
         var testInput = TestInput.Split("\r\n");
-        var solver = new Day13();
-        var orders = testInput.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = solver.Parse(chunk[0]), Second = solver.Parse(chunk[1]) })
+        var orders = testInput.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = PacketItem.Parse(chunk[0]), Second = PacketItem.Parse(chunk[1]) })
             .Select(p => p.First.CompareTo(p.Second) == -1);
         Assert.AreEqual(new[] { true,true, false,true,false,true,false,false }, orders);
     }
@@ -54,8 +53,7 @@ public class Day13Tests
     [Test]
     public void Day13ParseBasicList()
     {
-        var solver = new Day13();
-        var p = solver.Parse("[1,1,3,10,1]");
+        var p = PacketItem.Parse("[1,1,3,10,1]");
         Assert.AreEqual(5, p.List.Count);
         Assert.AreEqual(new List<int>() { 1,1,3,10,1}, p.List.Select(n => n.Number));
     }
@@ -63,9 +61,8 @@ public class Day13Tests
     [Test]
     public void Day13ParseNestedList()
     {
-        var solver = new Day13();
         var input = "[[1],[2,3,4]]";
-        var p = solver.Parse(input);
+        var p = PacketItem.Parse(input);
         Assert.AreEqual(2, p.List.Count);
         Assert.AreEqual(new List<int>() { 1, }, p.List[0].List.Select(n => n.Number));
         Assert.AreEqual(new List<int>() { 2,3,4 }, p.List[1].List.Select(n => n.Number));
@@ -75,8 +72,7 @@ public class Day13Tests
     [Test]
     public void Day13ParseEmptyList()
     {
-        var solver = new Day13();
-        var p = solver.Parse("[[[]]]");
+        var p = PacketItem.Parse("[[[]]]");
         Assert.AreEqual(1, p.List.Count);
         var firstChild = p.List[0];
         Assert.AreEqual(1, firstChild.List.Count);

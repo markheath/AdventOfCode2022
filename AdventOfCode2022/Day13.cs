@@ -1,12 +1,8 @@
-﻿using System.Text;
-
-namespace AdventOfCode2022;
+﻿namespace AdventOfCode2022;
 
 public class Day13 : ISolver
 {
     public (string, string) ExpectedResult => ("4643", "21614");
-
-
 
     public (string, string) Solve(string[] input)
     {
@@ -15,7 +11,7 @@ public class Day13 : ISolver
 
     public class PacketItem : IComparable<PacketItem>
     {
-        private int number;
+        private readonly int number;
         public int Number { get { if (!IsNumber) throw new InvalidOperationException("Not a number"); return number; }  }
         private bool IsNumber { get { return childPackets == null; } }
         private readonly List<PacketItem>? childPackets;
@@ -36,6 +32,44 @@ public class Day13 : ISolver
         public PacketItem(string numberValue)
         {
             number = int.Parse(numberValue);
+        }
+
+        public static PacketItem Parse(string s)
+        {
+            return Parse(s, 1).Item1;
+        }
+
+        private static (PacketItem, int) Parse(string s, int startPos)
+        {
+            PacketItem list = new PacketItem();
+            var currentNum = "";
+            for (var n = startPos; n < s.Length; n++)
+            {
+                var c = s[n];
+                if (c == '[')
+                {
+                    var (newList,newPos) = Parse(s, n + 1);
+                    list.Add(newList);
+                    n = newPos;
+                }
+                else if (c == ']' || c == ',')
+                {
+                    if (currentNum.Length > 0)
+                    {
+                        list.Add(new PacketItem(currentNum));
+                        currentNum = "";
+                    }
+                    if (c == ']')
+                    {
+                        return (list, n);
+                    }
+                }
+                else
+                {
+                    currentNum += c;
+                }
+            }
+            return (list,s.Length);
         }
 
         public override string ToString()
@@ -105,55 +139,20 @@ public class Day13 : ISolver
         }
     }
 
-    public PacketItem Parse(string s)
-    {
-        PacketItem? topLevel = null;
-        var listStack = new Stack<PacketItem>();
-        var currentNum = "";
-        foreach(var c in s)
-        {
-            if (c == '[')
-            {
-                var newList = new PacketItem();
-                if(topLevel == null) topLevel= newList;
-                else listStack.Peek().Add(newList);
-                listStack.Push(newList);
-            }
-            else if (c == ']' || c == ',')
-            {
-                if (currentNum.Length > 0)
-                {
-                    listStack.Peek().Add(new PacketItem(currentNum));
-                    currentNum = "";
-                }
-                if (c == ']')
-                {
-                    listStack.Pop();
-                }
-            }
-            else
-            {
-                currentNum += c;
-            }
-        }
-        if (topLevel == null) throw new InvalidOperationException("No packet found");
-        return topLevel;
-    }
-
     long Part1(IEnumerable<string> input)
     {
-        return input.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = Parse(chunk[0]), Second = Parse(chunk[1]) })
+        return input.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = PacketItem.Parse(chunk[0]), Second = PacketItem.Parse(chunk[1]) })
             .Where(p => p.First.CompareTo(p.Second) == -1).Sum(p => p.Index);
     }
+
     long Part2(IEnumerable<string> input)
     {
-        var allPackets = input.Where(s => !String.IsNullOrEmpty(s)).Select(Parse).ToList();
-        var divider1 = Parse("[[2]]");
-        var divider2 = Parse("[[6]]");
+        var allPackets = input.Where(s => !String.IsNullOrEmpty(s)).Select(PacketItem.Parse).ToList();
+        var divider1 = PacketItem.Parse("[[2]]");
+        var divider2 = PacketItem.Parse("[[6]]");
         allPackets.Add(divider1);
         allPackets.Add(divider2);
-        allPackets.Sort();
+        allPackets.Sort(); // uses the IComparable on PacketItem
         return (allPackets.IndexOf(divider1) + 1) * (allPackets.IndexOf(divider2) + 1);
     }
-
 }
