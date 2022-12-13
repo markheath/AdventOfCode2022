@@ -4,7 +4,7 @@ namespace AdventOfCode2022;
 
 public class Day13 : ISolver
 {
-    public (string, string) ExpectedResult => ("", ""); // 4683 wrong part 1 - too high
+    public (string, string) ExpectedResult => ("4643", "");
 
 
 
@@ -54,31 +54,40 @@ public class Day13 : ISolver
         public List<PacketItem> List { get;  }
         public ListPacketItem? Parent { get; }
 
-        public bool IsRightOrder(ListPacketItem other)
+        public int Compare(ListPacketItem other) // right order is 1 (true), wrong order is -1 (false)
         {
-
             for(var index = 0; index < this.List.Count; index++)
             {
                 var left = this.List[index];
                 // If the right list runs out of items first, the inputs are not in the right order.
-                if (index >= other.List.Count) return false;
+                if (index >= other.List.Count) return -1;
                 var right = other.List[index];
+                Console.WriteLine($"  - Compare {left} vs {right}");
 
                 if (left is IntPacketItem leftInt && right is IntPacketItem rightInt)
                 {
                     // If both values are integers, the lower integer should come first.
                     // If the left integer is lower than the right integer, the inputs are in the right order.
 
-                    if (leftInt.Number < rightInt.Number) return true;
+                    if (leftInt.Number < rightInt.Number)
+                    {
+                        Console.WriteLine($"  - Left side is smaller, so inputs are in the right order\r\n");
+                        return 1;
+                    }
                     // If the left integer is higher than the right integer, the inputs are not in the right order.
-                    if (leftInt.Number > rightInt.Number) return false;
+                    if (leftInt.Number > rightInt.Number)
+                    {
+                        Console.WriteLine($"  - Right side is smaller, so inputs are not in the right order\r\n");
+                        return -1;
+                    }
                     // Otherwise, the inputs are the same integer; continue checking the next part of the input
 
                 }
                 else if (left is ListPacketItem leftList && right is ListPacketItem rightList)
                 {
                     // If both values are lists, compare the first value of each list, then the second value, and so on.
-                    return leftList.IsRightOrder(rightList);
+                    var result = leftList.Compare(rightList);
+                    if (result != 0) return result;
                 }
                 else 
                 {
@@ -87,19 +96,24 @@ public class Day13 : ISolver
                     {
                         var leftList2 = new ListPacketItem(null);
                         leftList2.List.Add(left);
-                        return leftList2.IsRightOrder((ListPacketItem)right);
+                        var result = leftList2.Compare((ListPacketItem)right);
+                        if (result != 0) return result;
                     }
                     else // left is a list, right is a number
                     {
                         var rightList2 = new ListPacketItem(null);
                         rightList2.List.Add((IntPacketItem)right);
-                        return ((ListPacketItem)left).IsRightOrder(rightList2);
+                        var result = ((ListPacketItem)left).Compare(rightList2);
+                        if (result != 0) return result;
                     }
                 }
                 
             }
+            if (this.List.Count == other.List.Count) return 0; // lists can be a tie
+
             // If the left list runs out of items first, the inputs are in the right order.
-            return true; 
+            Console.WriteLine("Left side ran out of items, so inputs are in the right order");
+            return 1; 
         }
 
         public override string ToString()
@@ -161,7 +175,7 @@ public class Day13 : ISolver
     long Part1(IEnumerable<string> input)
     {
         return input.Chunk(3).Select((chunk, index) => new { Index = index + 1, First = Parse(chunk[0]), Second = Parse(chunk[1]) })
-            .Where(p => p.First.IsRightOrder(p.Second)).Sum(p => p.Index);
+            .Where(p => p.First.Compare(p.Second) == 1).Sum(p => p.Index);
     }
     long Part2(IEnumerable<string> input)
     {
