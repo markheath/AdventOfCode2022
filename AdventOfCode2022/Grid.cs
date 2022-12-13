@@ -63,7 +63,7 @@ public class Grid<T>
 
     public IEnumerable<Coord> Neighbours(Coord p, bool includeDiagonals = false)
     {
-        return p.Neighbours(includeDiagonals).Select(n => p + n).Where(IsInGrid);
+        return p.Neighbours(includeDiagonals).Where(IsInGrid);
     }
 
     public override string ToString()
