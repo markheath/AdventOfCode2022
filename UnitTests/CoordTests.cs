@@ -51,5 +51,14 @@ namespace UnitTests
             Assert.That(neighbours.Contains(new Coord(0, 2)));
             Assert.That(neighbours.Contains(new Coord(1, 1)));
         }
+
+        [Test]
+        public void LineTo()
+        {
+            var c = new Coord(3, 3);
+            var line = c.LineTo((3,0)).Take(1000).ToList();
+            Assert.AreEqual(4, line.Count);
+            Assert.AreEqual(new Coord[] { (3, 3), (3, 2), (3, 1), (3, 0) }, line);
+        }
     }
 }

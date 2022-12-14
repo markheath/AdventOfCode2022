@@ -35,6 +35,11 @@ public readonly struct Coord : IEnumerable<int>, IEquatable<Coord>
         return new Coord(a.x + b.x, a.y + b.y);
     }
 
+    public static Coord operator -(Coord a, Coord b)
+    {
+        return new Coord(a.x - b.x, a.y - b.y);
+    }
+
     public static bool operator ==(Coord a, Coord b)
     {
         return a.Equals(b);
@@ -53,6 +58,17 @@ public readonly struct Coord : IEnumerable<int>, IEquatable<Coord>
         var neighbours = includeDiagonals ? horizontalNeighbours.Concat(diagonalNeigbours) : horizontalNeighbours;
         var p = this;
         return neighbours.Select(n => p + n);
+    }
+
+    public IEnumerable<Coord> LineTo(Coord other)
+    {
+        var current = this;
+        yield return current;
+        while (current != other)
+        { 
+            current -= (current.X.CompareTo(other.X), current.Y.CompareTo(other.Y));
+            yield return current;
+        }
     }
 
     public override bool Equals(object? other) =>
