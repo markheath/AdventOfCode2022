@@ -16,7 +16,7 @@ public class Day14Tests
         var testInput = TestInput.Split("\r\n");
         var solver = new Day14();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("24", ""), solution);
+        Assert.AreEqual(("24", "93"), solution);
     }
 
 }
