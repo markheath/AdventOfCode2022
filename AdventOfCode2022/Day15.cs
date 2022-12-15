@@ -5,7 +5,7 @@ namespace AdventOfCode2022;
 
 public class Day15 : ISolver
 {
-    public (string, string) ExpectedResult => ("5832528", "13360899249595");// 4627827 too low 
+    public (string, string) ExpectedResult => ("5832528", "13360899249595");
 
     public int Part1(string[] input, int row)
     {

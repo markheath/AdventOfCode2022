@@ -18,7 +18,7 @@ public class Day14 : ISolver
 
         (g, offset) = ParseGrid(input, true);
         startingPos = new Coord(500, 0) + offset;
-        Console.WriteLine(g.ToString());
+        //Console.WriteLine(g.ToString());
         var part2 = 1 + SimulateSand(g, startingPos, sandPos => sandPos == startingPos);
 
         return ($"{part1}", $"{part2}");
@@ -76,15 +76,19 @@ public class Day14 : ISolver
     long SimulateSand(Grid<char> grid, Coord startingPos, Func<Coord, bool> exitCondition)
     {
         var grain = 0;
-        while(true)
+
+        Coord? lastFallDownPos = null;
+        while (true)
         {
-            var sandPos = startingPos;
-            if (grain % 20 == 0) Console.WriteLine($"GRID {grain}\r\n{grid}");
+            var sandPos = lastFallDownPos == null? startingPos : lastFallDownPos.Value;
+            lastFallDownPos = null;
+
             // fall down until stopped
             while (sandPos.Y < grid.Height - 1)
             {
                 if (grid[sandPos + (0, 1)] == '.')
                 {
+                    lastFallDownPos = sandPos;
                     sandPos += (0, 1);
                 }
                 else if (grid[sandPos + (-1, 1)] == '.')
