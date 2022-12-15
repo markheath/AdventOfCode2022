@@ -9,6 +9,8 @@ public class RangeCombiner : IEnumerable<(int,int)>
     
     public void Add(int start, int end)
     {
+        if (start > end || end < start) return;
+
         var mergedRange = (start, end);
         for (var n = 0; n < ranges.Count; n++)
         {
@@ -42,6 +44,12 @@ public class RangeCombiner : IEnumerable<(int,int)>
     public bool ContainsValue(int x)
     {
         return ranges.Any(r => x>= r.Item1 && x<= r.Item2);
+    }
+
+    public int Count { get { return ranges.Count; } }
+    public bool Covers(int start, int end)
+    {
+        return ranges.Any(r => r.Item1 <= start && r.Item2 >= end);
     }
 }
 
