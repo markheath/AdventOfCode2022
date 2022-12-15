@@ -1,18 +1,17 @@
-﻿using System.ComponentModel.Design;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace AdventOfCode2022;
 
 public class Day15 : ISolver
 {
-    public (string, string) ExpectedResult => ("", "");// 4627827 too low 
+    public (string, string) ExpectedResult => ("5832528", "");// 4627827 too low 
 
     public int Part1(string[] testInput, int row)
     {
         var sensors = testInput.Select(s => Regex.Matches(s,@"\-?\d+").Select(m => int.Parse(m.Value)).ToArray())
             .Select(m => new { Sensor = new Coord(m[0], m[1]), ClosestBeacon = new Coord(m[2], m[3]) })
             .ToList();
-        var ruledOut = new HashSet<int>();
+        var ruledOut = new RangeCombiner();
         foreach(var sensor in sensors)
         {
             var manhattenDistance = sensor.Sensor.ManhattenDistanceTo(sensor.ClosestBeacon);
@@ -21,16 +20,15 @@ public class Day15 : ISolver
             {
                 var rangeStart = sensor.Sensor.X - (manhattenDistance - distanceFromRow);
                 var rangeEnd = sensor.Sensor.X + (manhattenDistance - distanceFromRow);
-                for(var n = rangeStart ; n <= rangeEnd; n++) {
-                    ruledOut.Add(n);
-                }
+                ruledOut.Add(rangeStart, rangeEnd);
             }
         }
-        foreach(var b in sensors.Select(s => s.ClosestBeacon).Where(b => b.Y == row))
+        var count = ruledOut.Sum(r => r.Item2 - r.Item1 + 1);
+        foreach(var b in sensors.Select(s => s.ClosestBeacon).Distinct().Where(b => b.Y == row))
         {
-            ruledOut.Remove(b.X);
+            if (ruledOut.ContainsValue(b.X)) count--;
         }
-        return ruledOut.Count;
+        return count;
     }
 
     public (string, string) Solve(string[] input)

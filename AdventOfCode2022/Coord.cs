@@ -3,6 +3,48 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AdventOfCode2022;
 
+public class RangeCombiner : IEnumerable<(int,int)> 
+{
+    private readonly List<(int,int)> ranges = new List<(int, int)>();
+    
+    public void Add(int start, int end)
+    {
+        var mergedRange = (start, end);
+        for (var n = 0; n < ranges.Count; n++)
+        {
+            var range = ranges[n];
+            if (Overlap(range, mergedRange))
+            {
+                ranges.RemoveAt(n);
+                Add(Math.Min(range.Item1, mergedRange.Item1), Math.Max(range.Item2, mergedRange.Item2));
+                return;
+            }
+        }
+        ranges.Add(mergedRange);
+    }
+
+    public static bool Overlap((int,int) range1, (int,int)range2)
+    {
+        return (range1.Item2 >= range2.Item1 && range1.Item1 <= range2.Item2) ||
+            (range2.Item2 >= range1.Item1 && range2.Item1 <= range1.Item2);
+    }
+
+    public IEnumerator<(int, int)> GetEnumerator()
+    {
+        return ranges.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ranges.GetEnumerator();
+    }
+
+    public bool ContainsValue(int x)
+    {
+        return ranges.Any(r => x>= r.Item1 && x<= r.Item2);
+    }
+}
+
 public readonly struct Coord : IEnumerable<int>, IEquatable<Coord>
 {
     private readonly int x;
