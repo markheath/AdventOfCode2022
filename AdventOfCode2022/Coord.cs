@@ -105,4 +105,9 @@ public readonly struct Coord : IEnumerable<int>, IEquatable<Coord>
             _ => throw new NotImplementedException()
         };
     }
+
+    public int ManhattenDistanceTo(Coord other)
+    {
+        return Math.Abs(this.X - other.X) + Math.Abs(this.Y - other.Y);
+    }
 }
