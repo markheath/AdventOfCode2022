@@ -40,19 +40,20 @@ public class Day15 : ISolver
     long Part2(IEnumerable<string> input)
     {
         var sensors = input.Select(s => Regex.Matches(s, @"\-?\d+").Select(m => int.Parse(m.Value)).ToArray())
-    .Select(m => new { Sensor = new Coord(m[0], m[1]), ClosestBeacon = new Coord(m[2], m[3]) })
-    .ToList();
+            .Select(m => new { Sensor = new Coord(m[0], m[1]), ClosestBeacon = new Coord(m[2], m[3]) })
+            .Select(m => new { m.Sensor, m.ClosestBeacon, ManhattenDistance = m.Sensor.ManhattenDistanceTo(m.ClosestBeacon) })
+            .OrderByDescending(m => m.ManhattenDistance) // deal with biggest regions first
+            .ToList();
         for(var row = 0; row <= 4000000; row++)
         {
             var ruledOut = new RangeCombiner();
             foreach (var sensor in sensors)
             {
-                var manhattenDistance = sensor.Sensor.ManhattenDistanceTo(sensor.ClosestBeacon);
                 var distanceFromRow = Math.Abs(row - sensor.Sensor.Y);
-                if (distanceFromRow <= manhattenDistance)
+                if (distanceFromRow <= sensor.ManhattenDistance)
                 {
-                    var rangeStart = sensor.Sensor.X - (manhattenDistance - distanceFromRow);
-                    var rangeEnd = sensor.Sensor.X + (manhattenDistance - distanceFromRow);
+                    var rangeStart = sensor.Sensor.X - (sensor.ManhattenDistance - distanceFromRow);
+                    var rangeEnd = sensor.Sensor.X + (sensor.ManhattenDistance - distanceFromRow);
                     ruledOut.Add(Math.Max(0,rangeStart), Math.Min(4000000,rangeEnd));
                     if (ruledOut.Covers(0, 4000000)) break;
                 }
