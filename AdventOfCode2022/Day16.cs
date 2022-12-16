@@ -4,7 +4,7 @@ namespace AdventOfCode2022;
 
 public class Day16 : ISolver
 {
-    public (string, string) ExpectedResult => ("", "");
+    public (string, string) ExpectedResult => ("1716", "");
 
     public (string, string) Solve(string[] input)
     {
@@ -23,8 +23,68 @@ public class Day16 : ISolver
             PrintValves(valves);
         }
 
+        var allDests = valves.Keys.ToList();
+        foreach(var from in allDests)
+        {
+            foreach(var to in allDests)
+            {
+                if (!valves[from].Destinations.ContainsKey(to))
+                {
+                    ShortestDistance(from, to, valves);
+                }
+            }
+        }
+        // fully mincosted graph:
+        Console.WriteLine("With all dests:");
+        PrintValves(valves);
+
         return FindMaxFlow(valves, "AA", 30, 0, "").Max();
         //return 0; // first attempt took 50 minutes on test data and got 1650 (1 less than correct answer) 
+    }
+
+    // Dijkstra
+    private int ShortestDistance(string start, string end, IDictionary<string, Valve> valves)
+    {
+        var shortestRoutes = new Dictionary<string, int>();
+        var visited = new HashSet<string>();
+        shortestRoutes[start] = 0;
+        var queue = new List<string>
+        {
+            start
+        };
+        do
+        {
+            var node = queue.OrderBy(x => shortestRoutes[x]).First();
+            queue.Remove(node);
+            foreach (var connection in valves[node].Destinations.OrderBy(x => x.Value))
+            {
+                if (visited.Contains(connection.Key))
+                    continue;
+                if (!shortestRoutes.ContainsKey(connection.Key) ||
+                    shortestRoutes[node] + connection.Value < shortestRoutes[connection.Key])
+                {
+                    shortestRoutes[connection.Key] = shortestRoutes[node] + connection.Value;
+                    if (!queue.Contains(connection.Key))
+                        queue.Add(connection.Key);
+                }
+            }
+            visited.Add(node);
+            if (node == end)
+            {
+                // add all shortest paths we've worked out
+                foreach (var kvp in shortestRoutes)
+                {
+                    if (!valves[start].Destinations.ContainsKey(kvp.Key) && start != kvp.Key)
+                    {
+                        valves[start].Destinations[kvp.Key] = kvp.Value;
+                        valves[kvp.Key].Destinations[start] = kvp.Value;
+                    }
+                }
+
+                return shortestRoutes[end];
+            }
+        } while (queue.Any());
+        throw new InvalidOperationException("end not found");
     }
 
     private static void PrintValves(IDictionary<string, Valve> valves)
@@ -78,10 +138,16 @@ public class Day16 : ISolver
                 yield break;
             }
         }
-        valves = EliminateValve(currentPosition, valves);   
+        // make a new dictionary with current position removed:
+        var newValves = new Dictionary<string,Valve>();
+        foreach(var kvp in valves.Where(x => x.Key != currentPosition))
+        {
+            newValves[kvp.Key] = new Valve(kvp.Value.Name, kvp.Value.FlowRate, kvp.Value.Destinations.Where(x => x.Key != currentPosition).ToDictionary(x => x.Key, x => x.Value));
+        }
+        valves = newValves;
+
         if (currentValve.Destinations.Count > 0) 
         {
-            // .OrderByDescending(d => valves[d.Target].FlowRate * (timeRemaining - d.Distance))
             foreach (var dest in currentValve.Destinations)
             {
                 foreach (var flow in FindMaxFlow(valves, dest.Key, timeRemaining - dest.Value, currentFlow,journey))
@@ -93,7 +159,7 @@ public class Day16 : ISolver
         else
         {
             // nowhere else to go - all valves are open
-            Console.WriteLine($"Finished {currentFlow} {journey}");
+            //Console.WriteLine($"Finished {currentFlow} {journey}");
             yield return currentFlow;
         }
     }
