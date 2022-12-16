@@ -10,8 +10,7 @@ public class Day16 : ISolver
     {
         return ($"{Part1(input)}", $"{Part2(input)}");
     }
-    record Route(string Target, int Distance);
-    record Valve(string Name, int FlowRate, Route[] Destinations);
+    record Valve(string Name, int FlowRate, Dictionary<string,int> Destinations);
     long Part1(IEnumerable<string> input)
     {
         var valves = ParseValves(input);
@@ -32,7 +31,7 @@ public class Day16 : ISolver
     {
         foreach (var t in valves.Values)
         {
-            Console.WriteLine($"{t.Name} {t.FlowRate} {string.Join(",", t.Destinations.Select(d => $"{d.Target}:{d.Distance}"))}");
+            Console.WriteLine($"{t.Name} {t.FlowRate} {string.Join(",", t.Destinations.Select(d => $"{d.Key}:{d.Value}"))}");
         }
     }
 
@@ -43,13 +42,19 @@ public class Day16 : ISolver
         newDict.Remove(valveName);
         foreach (var dest in valve.Destinations)
         {
-            var destValve = newDict[dest.Target];
-            var newDestinations = new List<Route>(destValve.Destinations.Where(x => x.Target != valveName)); // all old destinations except the one we're removing
+            var destValve = newDict[dest.Key];
+            var newDestinations = new Dictionary<string,int>(destValve.Destinations);
+            newDestinations.Remove(valveName); // all old destinations except the one we're removing
+
             // add the destinations from the eliminated node, except to self
-            newDestinations.AddRange(valve.Destinations.Where(d => d.Target != dest.Target).Select(d => new Route(d.Target, d.Distance + dest.Distance)));
+            foreach (var kvp in valve.Destinations.Where(d => d.Key != dest.Key))
+            {
+                if (!newDestinations.ContainsKey(kvp.Key))
+                    newDestinations.Add(kvp.Key, kvp.Value + dest.Value);
+            }
 
             // replace
-            newDict[dest.Target] = new Valve(destValve.Name, destValve.FlowRate, newDestinations.ToArray());
+            newDict[dest.Key] = new Valve(destValve.Name, destValve.FlowRate, newDestinations);
         }
         return newDict;
     }
@@ -74,12 +79,12 @@ public class Day16 : ISolver
             }
         }
         valves = EliminateValve(currentPosition, valves);   
-        if (currentValve.Destinations.Length > 0) 
+        if (currentValve.Destinations.Count > 0) 
         {
             // .OrderByDescending(d => valves[d.Target].FlowRate * (timeRemaining - d.Distance))
             foreach (var dest in currentValve.Destinations)
             {
-                foreach (var flow in FindMaxFlow(valves, dest.Target, timeRemaining - dest.Distance, currentFlow,journey))
+                foreach (var flow in FindMaxFlow(valves, dest.Key, timeRemaining - dest.Value, currentFlow,journey))
                 {
                     yield return flow;
                 }
@@ -97,7 +102,7 @@ public class Day16 : ISolver
     {
         var tunnels = input.Select(l => Regex.Matches(l, "[A-Z][A-Z]").Select(m => m.Value).ToArray());
         var flowRates = input.Select(l => int.Parse(Regex.Match(l, "\\d+").Value)).ToArray();
-        var valves = tunnels.Zip(flowRates).Select(t => new Valve(t.First[0], t.Second, t.First.Skip(1).Select(d => new Route(d,1)).ToArray()));
+        var valves = tunnels.Zip(flowRates).Select(t => new Valve(t.First[0], t.Second, t.First.Skip(1).ToDictionary(d => d, d => 1)));
         return valves.ToDictionary(v => v.Name, v => v);
     }
 
