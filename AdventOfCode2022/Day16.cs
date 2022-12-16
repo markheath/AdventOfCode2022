@@ -16,7 +16,7 @@ public class Day16 : ISolver
         var valves = ParseValves(input);
 
 
-        return FindMaxFlow(valves, "AA", 30, 0, "").Max();
+        return FindMaxFlow(valves, new HashSet<string>(), "AA", 30, 0, "").Max();
         //return 0; // first attempt took 50 minutes on test data and got 1650 (1 less than correct answer) 
     }
 
@@ -97,7 +97,7 @@ public class Day16 : ISolver
         return newDict;
     }
 
-    IEnumerable<int> FindMaxFlow(IDictionary<string,Valve> valves, string currentPosition, int timeRemaining, int currentFlow, string journey)
+    IEnumerable<int> FindMaxFlow(IDictionary<string,Valve> valves, HashSet<string> openedValves, string currentPosition, int timeRemaining, int currentFlow, string journey)
     {
         if (timeRemaining <= 0)
         {
@@ -105,9 +105,11 @@ public class Day16 : ISolver
             yield break;
         }
         var currentValve = valves[currentPosition];
-        if(currentValve.FlowRate > 0)
+        if (currentValve.FlowRate > 0)
         {
-            journey += $",opening {currentPosition} at minute {1+30-timeRemaining}";
+            journey += $",opening {currentPosition} at minute {1 + 30 - timeRemaining}";
+            openedValves = new HashSet<string>(openedValves);
+            openedValves.Add(currentPosition);
             timeRemaining--; // time to open the valve
             currentFlow += timeRemaining * currentValve.FlowRate;
             if (timeRemaining <= 0)
@@ -116,30 +118,32 @@ public class Day16 : ISolver
                 yield break;
             }
         }
-        // make a new dictionary with current position removed:
-        var newValves = new Dictionary<string,Valve>();
-        foreach(var kvp in valves.Where(x => x.Key != currentPosition))
+        var reachedEnd = true;
+        foreach (var dest in currentValve.Destinations.Where(d => !openedValves.Contains(d.Key)))
         {
-            newValves[kvp.Key] = new Valve(kvp.Value.Name, kvp.Value.FlowRate, kvp.Value.Destinations.Where(x => x.Key != currentPosition).ToDictionary(x => x.Key, x => x.Value));
-        }
-        valves = newValves;
-
-        if (currentValve.Destinations.Count > 0) 
-        {
-            foreach (var dest in currentValve.Destinations)
+            reachedEnd = false;
+            foreach (var flow in FindMaxFlow(valves, openedValves, dest.Key, timeRemaining - dest.Value, currentFlow, journey))
             {
-                foreach (var flow in FindMaxFlow(valves, dest.Key, timeRemaining - dest.Value, currentFlow,journey))
-                {
-                    yield return flow;
-                }
+                yield return flow;
             }
         }
-        else
+        if (reachedEnd)
         {
             // nowhere else to go - all valves are open
             //Console.WriteLine($"Finished {currentFlow} {journey}");
             yield return currentFlow;
         }
+    }
+
+    private static Dictionary<string, Valve> RemoveValve(IDictionary<string, Valve> valves, string currentPosition)
+    {
+        var newValves = new Dictionary<string, Valve>();
+        foreach (var kvp in valves.Where(x => x.Key != currentPosition))
+        {
+            newValves[kvp.Key] = new Valve(kvp.Value.Name, kvp.Value.FlowRate, kvp.Value.Destinations.Where(x => x.Key != currentPosition).ToDictionary(x => x.Key, x => x.Value));
+        }
+
+        return newValves;
     }
 
     private IDictionary<string,Valve> ParseValves(IEnumerable<string> input)
@@ -176,6 +180,59 @@ public class Day16 : ISolver
         return valves;
     }
 
-    long Part2(IEnumerable<string> input) => 0;
+    long Part2(IEnumerable<string> input)
+    {
+        var valves = ParseValves(input);
+
+        //return FindMaxFlow2(valves, "AA", 0, "AA", 0, 26, 0).Max();
+        return 0;
+    }
+
+
+    IEnumerable<int> FindMaxFlow2(IDictionary<string, Valve> valves, string myNextPosition, int myArrivalTime, string elephantNextPosition, int elephantArrivalTime, int timeRemaining, int currentFlow)
+    {
+        if (timeRemaining <= 0)
+        {
+            yield return currentFlow;
+            yield break;
+        }
+        if (myArrivalTime == 0)
+        {
+
+        }
+
+
+        var currentValve = valves[myNextPosition];
+        if (currentValve.FlowRate > 0)
+        {
+            timeRemaining--; // time to open the valve
+            currentFlow += timeRemaining * currentValve.FlowRate;
+            if (timeRemaining <= 0)
+            {
+                yield return currentFlow;
+                yield break;
+            }
+        }
+        // make a new dictionary with current position removed:
+        valves = RemoveValve(valves, myNextPosition);
+
+        if (currentValve.Destinations.Count > 0)
+        {
+            foreach (var dest in currentValve.Destinations)
+            {
+               /* foreach (var flow in FindMaxFlow(valves, dest.Key, timeRemaining - dest.Value, currentFlow))
+                {
+                    yield return flow;
+                }*/
+            }
+        }
+        else
+        {
+            // nowhere else to go - all valves are open
+            //Console.WriteLine($"Finished {currentFlow} {journey}");
+            yield return currentFlow;
+        }
+    }
 
 }
+
