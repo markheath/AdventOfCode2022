@@ -18,12 +18,12 @@ Valve JJ has flow rate=21; tunnel leads to valve II";
     
 
     [Test]
-    public void Day16Part1()
+    public void Day16TestInput()
     {
         var testInput = TestInput.Split("\r\n");
         var solver = new Day16();
         var solution = solver.Solve(testInput);
-        Assert.AreEqual(("1651", ""), solution);
+        Assert.AreEqual(("1651", "1707"), solution);
     }
 
 }

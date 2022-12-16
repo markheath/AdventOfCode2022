@@ -14,29 +14,7 @@ public class Day16 : ISolver
     long Part1(IEnumerable<string> input)
     {
         var valves = ParseValves(input);
-        PrintValves(valves);
-        var toRemove = valves.Values.Where(x => x.FlowRate == 0 && x.Name != "AA").ToList();
-        foreach (var v in toRemove)
-        {
-            Console.WriteLine($"Eliminating {v.Name}:");
-            valves = EliminateValve(v.Name, valves);
-            PrintValves(valves);
-        }
 
-        var allDests = valves.Keys.ToList();
-        foreach(var from in allDests)
-        {
-            foreach(var to in allDests)
-            {
-                if (!valves[from].Destinations.ContainsKey(to))
-                {
-                    ShortestDistance(from, to, valves);
-                }
-            }
-        }
-        // fully mincosted graph:
-        Console.WriteLine("With all dests:");
-        PrintValves(valves);
 
         return FindMaxFlow(valves, "AA", 30, 0, "").Max();
         //return 0; // first attempt took 50 minutes on test data and got 1650 (1 less than correct answer) 
@@ -164,12 +142,38 @@ public class Day16 : ISolver
         }
     }
 
-    private static IDictionary<string,Valve> ParseValves(IEnumerable<string> input)
+    private IDictionary<string,Valve> ParseValves(IEnumerable<string> input)
     {
         var tunnels = input.Select(l => Regex.Matches(l, "[A-Z][A-Z]").Select(m => m.Value).ToArray());
         var flowRates = input.Select(l => int.Parse(Regex.Match(l, "\\d+").Value)).ToArray();
-        var valves = tunnels.Zip(flowRates).Select(t => new Valve(t.First[0], t.Second, t.First.Skip(1).ToDictionary(d => d, d => 1)));
-        return valves.ToDictionary(v => v.Name, v => v);
+        var allValves = tunnels.Zip(flowRates).Select(t => new Valve(t.First[0], t.Second, t.First.Skip(1).ToDictionary(d => d, d => 1)));
+        IDictionary<string,Valve> valves = allValves.ToDictionary(v => v.Name, v => v);
+
+
+        PrintValves(valves);
+        var toRemove = valves.Values.Where(x => x.FlowRate == 0 && x.Name != "AA").ToList();
+        foreach (var v in toRemove)
+        {
+            Console.WriteLine($"Eliminating {v.Name}:");
+            valves = EliminateValve(v.Name, valves);
+            PrintValves(valves);
+        }
+
+        var allDests = valves.Keys.ToList();
+        foreach (var from in allDests)
+        {
+            foreach (var to in allDests)
+            {
+                if (!valves[from].Destinations.ContainsKey(to))
+                {
+                    ShortestDistance(from, to, valves);
+                }
+            }
+        }
+        // fully mincosted graph:
+        Console.WriteLine("With all dests:");
+        PrintValves(valves);
+        return valves;
     }
 
     long Part2(IEnumerable<string> input) => 0;
