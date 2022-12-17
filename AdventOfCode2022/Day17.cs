@@ -1,15 +1,19 @@
-﻿namespace AdventOfCode2022;
+﻿using static AdventOfCode2022.Day17;
+
+namespace AdventOfCode2022;
 
 public class Day17 : ISolver
 {
-    public (string, string) ExpectedResult => ("3081", "");
+    public (string, string) ExpectedResult => ("3081", "1524637681145");
 
     public (string, string) Solve(string[] input)
     {
         var rockGrid = new RockGrid(input[0]);
         rockGrid.Run(2022);
         var part1 = rockGrid.HighestEmptyRow;
-        return ($"{part1}", "0");
+        rockGrid = new RockGrid(input[0]);
+        var part2 = rockGrid.CountRows(1000000000000);
+        return ($"{part1}", $"{part2}");
     }
 
     public class RockGrid
@@ -137,6 +141,38 @@ public class Day17 : ISolver
             }
             l.Reverse();
             return string.Join("\r\n", l);
+        }
+
+        public long CountRows(long requiredDroppedRocks)
+        {
+            var periodicity = JetPattern.Length * 5;
+            
+            // do the first run which is special
+            RunSteps(periodicity);
+            var initialRows = HighestEmptyRow;
+            var initialDroppedRocks = DroppedRocks;
+            Console.WriteLine($"First period drops {initialDroppedRocks} rocks and adds {initialRows} rows");
+
+            // do the next run which is repeating
+            RunSteps(periodicity);
+            var periodAddRows = HighestEmptyRow - initialRows;
+            var periodDropRocks = DroppedRocks - initialDroppedRocks;
+            Console.WriteLine($"Every period of {periodicity} drops {periodDropRocks} rocks and adds {periodAddRows} rows");
+
+            // calculate the number of times the period must run
+            var droppedRocksNeeded = requiredDroppedRocks - initialDroppedRocks;
+            var periodsNeeded = droppedRocksNeeded / periodDropRocks;
+            Console.WriteLine($"Need {periodsNeeded} period");
+
+            droppedRocksNeeded -= periodDropRocks * periodsNeeded;
+
+            Console.WriteLine($"Need to drop another {droppedRocksNeeded} rocks after the periods");
+            var before = HighestEmptyRow;
+            Run((int)droppedRocksNeeded);
+            var finalStageAddedRows = HighestEmptyRow - before;
+
+            var totalRows = initialRows + periodAddRows * periodsNeeded + finalStageAddedRows;
+            return totalRows;
         }
     }
 

@@ -36,36 +36,9 @@ public class Day17Tests
     [Test]
     public void Day17Part2TestInput()
     {
-        var periodicity = TestInput.Length * 5;
-
-        var rockGrid = new RockGrid(TestInput);
         
-        // do the first run which is special
-        rockGrid.RunSteps(periodicity);
-        var initialRows = rockGrid.HighestEmptyRow;
-        var initialDroppedRocks = rockGrid.DroppedRocks;
-        Console.WriteLine($"First period drops {initialDroppedRocks} rocks and adds {initialRows} rows");
-
-        // do the next run which is repeating
-        rockGrid.RunSteps(periodicity);
-        var periodAddRows = rockGrid.HighestEmptyRow - initialRows;
-        var periodDropRocks = rockGrid.DroppedRocks - initialDroppedRocks;
-        Console.WriteLine($"Every period of {periodicity} drops {periodDropRocks} rocks and adds {periodAddRows} rows");
-
-        // calculate the number of times the period must run
-        var droppedRocksNeeded = 1000000000000 - initialDroppedRocks;
-        var periodsNeeded = droppedRocksNeeded / periodDropRocks;
-        Console.WriteLine($"Need {periodsNeeded} period");
-
-        droppedRocksNeeded -= periodDropRocks * periodsNeeded;
-
-        Console.WriteLine($"Need to drop another {droppedRocksNeeded} rocks after the periods");
-        var before = rockGrid.HighestEmptyRow;
-        rockGrid.Run((int)droppedRocksNeeded);
-        var finalStageAddedRows = rockGrid.HighestEmptyRow - before;
-
-        var totalRows = initialRows + periodAddRows * periodsNeeded + finalStageAddedRows;   
-
+        var rockGrid = new RockGrid(TestInput);
+        var totalRows = rockGrid.CountRows(1000000000000);
         var expected = 1514285714288;
         Assert.AreEqual(expected, totalRows);
     }
