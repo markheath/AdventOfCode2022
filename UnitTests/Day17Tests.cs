@@ -33,25 +33,41 @@ public class Day17Tests
             rocksDropped = rockGrid.DroppedRocks;
         }
     }
-
+    [Test]
     public void Day17Part2TestInput()
     {
         var periodicity = TestInput.Length * 5;
-        var initialRun = 1;
-        var repeats = 7;
 
         var rockGrid = new RockGrid(TestInput);
-        rockGrid.Run(initialRun * periodicity);
-        var highest = rockGrid.HighestEmptyRow;
-        rockGrid.Run(repeats * periodicity);
+        
+        // do the first run which is special
+        rockGrid.RunSteps(periodicity);
+        var initialRows = rockGrid.HighestEmptyRow;
+        var initialDroppedRocks = rockGrid.DroppedRocks;
+        Console.WriteLine($"First period drops {initialDroppedRocks} rocks and adds {initialRows} rows");
 
+        // do the next run which is repeating
+        rockGrid.RunSteps(periodicity);
+        var periodAddRows = rockGrid.HighestEmptyRow - initialRows;
+        var periodDropRocks = rockGrid.DroppedRocks - initialDroppedRocks;
+        Console.WriteLine($"Every period of {periodicity} drops {periodDropRocks} rocks and adds {periodAddRows} rows");
 
-        var leftovers = 1000000000000 - periodicity % periodicity;
-        Console.WriteLine($"leftovers: {leftovers}");
+        // calculate the number of times the period must run
+        var droppedRocksNeeded = 1000000000000 - initialDroppedRocks;
+        var periodsNeeded = droppedRocksNeeded / periodDropRocks;
+        Console.WriteLine($"Need {periodsNeeded} period");
 
-        // for test input 1 run, followed by groups of 7 had repeating pattern
+        droppedRocksNeeded -= periodDropRocks * periodsNeeded;
+
+        Console.WriteLine($"Need to drop another {droppedRocksNeeded} rocks after the periods");
+        var before = rockGrid.HighestEmptyRow;
+        rockGrid.Run((int)droppedRocksNeeded);
+        var finalStageAddedRows = rockGrid.HighestEmptyRow - before;
+
+        var totalRows = initialRows + periodAddRows * periodsNeeded + finalStageAddedRows;   
+
         var expected = 1514285714288;
-
+        Assert.AreEqual(expected, totalRows);
     }
 
     [Test]
