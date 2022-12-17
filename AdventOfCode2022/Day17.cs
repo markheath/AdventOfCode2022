@@ -66,12 +66,23 @@ public class Day17 : ISolver
         
         public void Run(int droppedRocks)
         {
-            while(DroppedRocks < droppedRocks)
+            int count = 0;
+            while(count < droppedRocks)
+            {
+                PushRock();
+                if (DropRock()) count++;
+            }
+        }
+
+        public void RunSteps(int steps)
+        {
+            for(int n = 0; n < steps; n++)
             {
                 PushRock();
                 DropRock();
             }
         }
+
 
         public void PushRock()
         {
@@ -89,7 +100,7 @@ public class Day17 : ISolver
             jetPatternIndex %= JetPattern.Length;
         }
 
-        public void DropRock()
+        public bool DropRock()
         {
             var currentShapePoints = GetCurrentShapeCoords().ToList();
             var testPos = currentShapePoints.Select(c => c + (0,-1)).ToList();
@@ -102,12 +113,13 @@ public class Day17 : ISolver
                 currentShape++;
                 currentShape %= Shapes.Length;
                 currentShapeBottomLeft = (2, HighestEmptyRow+3);
+                return true;
             }
             else
             {
                 currentShapeBottomLeft += (0, -1);
             }
-
+            return false;
         }
 
 

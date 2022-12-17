@@ -19,6 +19,42 @@ public class Day17Tests
     }
 
     [Test]
+    public void Day17Part2ExplorePeriodicity()
+    {
+        var rockGrid = new RockGrid(TestInput);
+        var periodicity = TestInput.Length * 5;
+        var highestEmpty = 0;
+        var rocksDropped = 0;
+        for (var n = 0; n < 20; n++)
+        {
+            rockGrid.RunSteps(periodicity);
+            Console.WriteLine($"Run {n + 1}: {rockGrid.HighestEmptyRow - highestEmpty} rows added, {rockGrid.DroppedRocks - rocksDropped} rocks dropped");
+            highestEmpty = rockGrid.HighestEmptyRow;
+            rocksDropped = rockGrid.DroppedRocks;
+        }
+    }
+
+    public void Day17Part2TestInput()
+    {
+        var periodicity = TestInput.Length * 5;
+        var initialRun = 1;
+        var repeats = 7;
+
+        var rockGrid = new RockGrid(TestInput);
+        rockGrid.Run(initialRun * periodicity);
+        var highest = rockGrid.HighestEmptyRow;
+        rockGrid.Run(repeats * periodicity);
+
+
+        var leftovers = 1000000000000 - periodicity % periodicity;
+        Console.WriteLine($"leftovers: {leftovers}");
+
+        // for test input 1 run, followed by groups of 7 had repeating pattern
+        var expected = 1514285714288;
+
+    }
+
+    [Test]
     public void Day17GridDrawing()
     {
         var rockGrid = new RockGrid(TestInput);
