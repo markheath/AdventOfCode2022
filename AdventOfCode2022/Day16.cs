@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 using SuperLinq;
 
 namespace AdventOfCode2022;
@@ -9,18 +10,17 @@ public class Day16 : ISolver
 
     public (string, string) Solve(string[] input)
     {
-        return ($"{Part1(input)}", $"{Part2(input)}");
+        var valves = ParseValves(input);
+        var sw = Stopwatch.StartNew();        
+        var part1 = FindMaxFlow2(valves, new HashSet<string>() { "AA" }, ("AA", 30), ("XXX", 0));
+        Console.WriteLine($"Part1 {part1} in {sw.Elapsed}");
+        sw.Restart();
+        var part2 = FindMaxFlow2(valves, new HashSet<string>() { "AA" }, ("AA", 26), ("AA", 26));
+        Console.WriteLine($"Part2 {part2} in {sw.Elapsed}");
+
+        return ($"{part1}", $"{part2}");
     }
     record Valve(string Name, int FlowRate, Dictionary<string,int> Destinations);
-    long Part1(IEnumerable<string> input)
-    {
-        var valves = ParseValves(input);
-
-        int bestSoFar = 0;
-        FindMaxFlow(valves, new HashSet<string>(), ref bestSoFar, "AA", 30, 0, "");
-        return bestSoFar;
-        //return 0; // first attempt took 50 minutes on test data and got 1650 (1 less than correct answer) 
-    }
 
     // Dijkstra
     private int ShortestDistance(string start, string end, IDictionary<string, Valve> valves)
@@ -99,48 +99,12 @@ public class Day16 : ISolver
         return newDict;
     }
 
-    void FindMaxFlow(IDictionary<string,Valve> valves, HashSet<string> openedValves, ref int bestSoFar, string currentPosition, int timeRemaining, int currentFlow, string journey)
-    {
-        if (timeRemaining <= 0)
-        {
-            bestSoFar = Math.Max(bestSoFar, currentFlow);
-            return;
-        }
-        var currentValve = valves[currentPosition];
-        if (currentValve.FlowRate > 0)
-        {
-            journey += $",opening {currentPosition} at minute {1 + 30 - timeRemaining}";
-            openedValves = new HashSet<string>(openedValves);
-            openedValves.Add(currentPosition);
-            timeRemaining--; // time to open the valve
-            currentFlow += timeRemaining * currentValve.FlowRate;
-            if (timeRemaining <= 0)
-            {
-                bestSoFar = Math.Max(bestSoFar, currentFlow);
-                return;
-            }
-        }
-        var reachedEnd = true;
-        foreach (var dest in currentValve.Destinations.Where(d => !openedValves.Contains(d.Key)))
-        {
-            reachedEnd = false;
-            FindMaxFlow(valves, openedValves, ref bestSoFar, dest.Key, timeRemaining - dest.Value, currentFlow, journey);
-        }
-        if (reachedEnd)
-        {
-            // nowhere else to go - all valves are open
-            //Console.WriteLine($"Finished {currentFlow} {journey}");
-            bestSoFar = Math.Max(bestSoFar, currentFlow);
-        }
-    }
-
     private IDictionary<string,Valve> ParseValves(IEnumerable<string> input)
     {
         var tunnels = input.Select(l => Regex.Matches(l, "[A-Z][A-Z]").Select(m => m.Value).ToArray());
         var flowRates = input.Select(l => int.Parse(Regex.Match(l, "\\d+").Value)).ToArray();
         var allValves = tunnels.Zip(flowRates).Select(t => new Valve(t.First[0], t.Second, t.First.Skip(1).ToDictionary(d => d, d => 1)));
         IDictionary<string,Valve> valves = allValves.ToDictionary(v => v.Name, v => v);
-
 
         //PrintValves(valves);
         var toRemove = valves.Values.Where(x => x.FlowRate == 0 && x.Name != "AA").ToList();
@@ -168,17 +132,11 @@ public class Day16 : ISolver
         return valves;
     }
 
-    long Part2(IEnumerable<string> input)
-    {
-        var valves = ParseValves(input);
-        // start with AA as an already opened valve
-        return FindMaxFlow2(valves, new HashSet<string>() { "AA" }, ("AA",26), ("AA",26));
-    }
 
-    int bestSoFar = 0;
+    //int bestSoFar = 0;
     int FindMaxFlow2(IDictionary<string, Valve> valves, HashSet<string> openedValves, (string Location,int TimeRemaining)p0, (string Location, int TimeRemaining) p1)
     {
-        // deal with player who has most time lieft first
+        // deal with player who has most time left first
         var (maxP, other) = (p0.TimeRemaining >= p1.TimeRemaining) ? (p0, p1) : (p1, p0);
         // what valves does this player still have time to open?
         var max = 0;
@@ -190,8 +148,8 @@ public class Day16 : ISolver
             var destFlow = valves[dest.Key].FlowRate * timeLeft;
             var extraFlow = FindMaxFlow2(valves, new HashSet<string>(openedValves) { dest.Key }, (dest.Key, timeLeft), other);
             max = Math.Max(max, destFlow + extraFlow);
-            if (max > bestSoFar)
-            { bestSoFar = max; Console.WriteLine(bestSoFar); }
+            //if (max > bestSoFar)
+            //{ bestSoFar = max; Console.WriteLine(bestSoFar); }
         }
         return max;
     }
