@@ -27,6 +27,7 @@ public class Day18Tests
         var solver = new Day18();
         var (part1,part2) = solver.Solve(TestInput.Split("\r\n"));
         Assert.AreEqual("64", part1);
+        Assert.AreEqual("58", part2);
     }
 
 }

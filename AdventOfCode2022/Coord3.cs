@@ -100,4 +100,24 @@ public readonly struct Coord3 : IEnumerable<int>, IEquatable<Coord3>
     {
         return !(left == right);
     }
+
+    public static bool operator < (Coord3 left, Coord3 right)
+    {
+        return (left.X < right.X && left.Y < right.Y && left.Z < right.Z);
+    }
+
+    public static bool operator >(Coord3 left, Coord3 right)
+    {
+        return (left.X > right.X && left.Y > right.Y && left.Z > right.Z);
+    }
+
+    public static bool operator <=(Coord3 left, Coord3 right)
+    {
+        return (left.X <= right.X && left.Y <= right.Y && left.Z <= right.Z);
+    }
+
+    public static bool operator >=(Coord3 left, Coord3 right)
+    {
+        return (left.X >= right.X && left.Y >= right.Y && left.Z >= right.Z);
+    }
 }
