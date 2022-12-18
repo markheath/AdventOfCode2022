@@ -64,6 +64,19 @@ public readonly struct Coord3 : IEnumerable<int>, IEquatable<Coord3>
         yield return z;
     }
 
+    private static readonly IEnumerable<Coord3> horizontalNeighbours = new Coord3[] 
+    { (-1, 0, 0), (1, 0, 0), (0,1,0), (0,-1,0), (0,0,-1), (0,0,1) };
+    /*private static readonly IEnumerable<Coord3> diagonalNeigbours = new Coord3[] 
+    { new (-1, -1), new (1, 1), new (1, -1), new (-1, 1) };*/
+
+    public IEnumerable<Coord3> Neighbours(bool includeDiagonals = false)
+    {
+        //var neighbours = includeDiagonals ? horizontalNeighbours.Concat(diagonalNeigbours) : horizontalNeighbours;
+        var neighbours = horizontalNeighbours;
+        var p = this;
+        return neighbours.Select(n => p + n);
+    }
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public Coord3 RotateClockwiseAroundZ(int degrees)
