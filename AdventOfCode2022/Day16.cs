@@ -132,10 +132,17 @@ public class Day16 : ISolver
         return valves;
     }
 
+    Dictionary<string, int> cache = new();
 
     //int bestSoFar = 0;
     int FindMaxFlow2(IDictionary<string, Valve> valves, HashSet<string> openedValves, (string Location,int TimeRemaining)p0, (string Location, int TimeRemaining) p1)
     {
+        var cacheKey = $"{string.Join(',', openedValves.Order())},{p0},{p1}";
+        if (cache.ContainsKey(cacheKey))
+        {
+            //Console.WriteLine($"HIT: {cacheKey}");
+            return cache[cacheKey];
+        }
         // deal with player who has most time left first
         var (maxP, other) = (p0.TimeRemaining >= p1.TimeRemaining) ? (p0, p1) : (p1, p0);
         // what valves does this player still have time to open?
@@ -151,6 +158,7 @@ public class Day16 : ISolver
             //if (max > bestSoFar)
             //{ bestSoFar = max; Console.WriteLine(bestSoFar); }
         }
+        cache[cacheKey] = max;
         return max;
     }
 
