@@ -142,7 +142,7 @@ public class Day16 : ISolver
         IDictionary<string,Valve> valves = allValves.ToDictionary(v => v.Name, v => v);
 
 
-        PrintValves(valves);
+        //PrintValves(valves);
         var toRemove = valves.Values.Where(x => x.FlowRate == 0 && x.Name != "AA").ToList();
         foreach (var v in toRemove)
         {
@@ -172,89 +172,28 @@ public class Day16 : ISolver
     {
         var valves = ParseValves(input);
         // start with AA as an already opened valve
-        var bestSoFar = 0;
-        FindMaxFlow2(valves, new HashSet<string>() { "AA" }, ref bestSoFar, new[] { ("AA",0), ("AA",0) }, 26, 0, "");
-        return bestSoFar;
+        return FindMaxFlow2(valves, new HashSet<string>() { "AA" }, ("AA",26), ("AA",26));
     }
 
-    void FindMaxFlow2(IDictionary<string, Valve> valves, HashSet<string> openedValves, ref int bestSoFar, (string,int)[] players, int timeRemaining, int currentFlow, string journey)
+    int bestSoFar = 0;
+    int FindMaxFlow2(IDictionary<string, Valve> valves, HashSet<string> openedValves, (string Location,int TimeRemaining)p0, (string Location, int TimeRemaining) p1)
     {
-        if (timeRemaining <= 0)
+        // deal with player who has most time lieft first
+        var (maxP, other) = (p0.TimeRemaining >= p1.TimeRemaining) ? (p0, p1) : (p1, p0);
+        // what valves does this player still have time to open?
+        var max = 0;
+        foreach(var dest in valves[maxP.Location].Destinations
+                .Where(d => !openedValves.Contains(d.Key))
+                .Where(d => d.Value + 1 <= maxP.TimeRemaining))
         {
-            if (currentFlow > bestSoFar) Console.WriteLine($"New high score {currentFlow}");
-            bestSoFar = Math.Max(bestSoFar, currentFlow);
-            return;
+            var timeLeft = (maxP.TimeRemaining - dest.Value - 1);
+            var destFlow = valves[dest.Key].FlowRate * timeLeft;
+            var extraFlow = FindMaxFlow2(valves, new HashSet<string>(openedValves) { dest.Key }, (dest.Key, timeLeft), other);
+            max = Math.Max(max, destFlow + extraFlow);
+            if (max > bestSoFar)
+            { bestSoFar = max; Console.WriteLine(bestSoFar); }
         }
-        var t = 26 - timeRemaining + 1;
-        var possibleDests = players.Select(_ => new List<(string,int)>()).ToList();
-        var avoidDests = new HashSet<string>();
-        // decide what they will do next if they are not en route
-        for (var p = 0; p < players.Length; p++)
-        {
-            var (currentValveName, arrivalTime) = players[p];
-            if (arrivalTime < 0) throw new InvalidOperationException();
-            if (arrivalTime == 0)
-            {
-                var currentValve = valves[currentValveName];
-                if (!openedValves.Contains(currentValveName))
-                {
-                    journey += $"{t}: p[{p}] opens {currentValveName}, ";
-                    openedValves = new HashSet<string>(openedValves) { currentValveName };
-                    currentFlow += (timeRemaining-1) * currentValve.FlowRate;
-                    possibleDests[p].Add((currentValveName, 0)); // we'll "arrive" here again
-                    avoidDests.Add(currentValveName);
-                }
-                else
-                {                     
-                    // we can only choose destinations when we know what the other player is doing
-                }
-            }
-            else
-            {
-                possibleDests[p].Add((currentValveName, arrivalTime-1));  // getting closer
-                avoidDests.Add(currentValveName);
-            }
-        }
-
-        for (var p = 0; p < players.Length; p++)
-        {
-            var (currentValveName, arrivalTime) = players[p];
-            if (possibleDests[p].Count == 0)
-            {
-                var currentValve = valves[currentValveName];
-                // valve is already open here, let's pick somewhere else to go
-                possibleDests[p].AddRange(currentValve.Destinations
-                    .Where(d => !openedValves.Contains(d.Key))
-                    .Where(d => !avoidDests.Contains(d.Key))
-                    .OrderByDescending(d => valves[d.Key].FlowRate * (timeRemaining-d.Value-1))
-                    .Select(d => (d.Key, d.Value - 1))); // have already used this second to move towards this square
-            }
-        }
-
-        var reachedEnd = true;
-        if (possibleDests[0].Count == 1 && possibleDests[1].Count == 0) {
-            possibleDests[1].Add(("XXXX", 1000));
-        }
-        else if (possibleDests[1].Count == 1 && possibleDests[0].Count == 0)
-        {
-            possibleDests[0].Add(("XXXX", 1000));
-        }
-
-        // try every possible pair of next actions, but don't both go to open the same valve if we're moving on the same turn
-        foreach (var possible in possibleDests[0].Cartesian(possibleDests[1], (x, y) => (x,y)).Where(p => p.x.Item1 != p.y.Item1))
-        {
-            reachedEnd = false;
-            FindMaxFlow2(valves, new HashSet<string>(openedValves), ref bestSoFar, new(string,int)[] { possible.x, possible.y }, timeRemaining - 1, currentFlow, journey);
-            //break;
-        }
-        if (reachedEnd)
-        {
-            // nowhere else to go - all valves are open
-            //Console.WriteLine($"Finished {currentFlow} {journey}");
-            if (currentFlow > bestSoFar) Console.WriteLine($"New high score {currentFlow}");
-
-            bestSoFar = Math.Max(bestSoFar, currentFlow);
-        }
+        return max;
     }
 
 }
