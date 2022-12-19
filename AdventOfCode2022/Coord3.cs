@@ -38,6 +38,11 @@ public readonly struct Coord3 : IEnumerable<int>, IEquatable<Coord3>
         return new Coord3(a.x + b.x, a.y + b.y, a.z + b.z);
     }
 
+    public static Coord3 operator -(Coord3 a, Coord3 b)
+    {
+        return new Coord3(a.x - b.x, a.y - b.y, a.z - b.z);
+    }
+
     public override bool Equals(object? obj)
     {
         return obj is Coord3 c
