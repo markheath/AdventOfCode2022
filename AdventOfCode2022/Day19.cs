@@ -29,32 +29,44 @@ public class Day19 : ISolver
         timeRemaining--;
         if (timeRemaining <= 0) return 0;
         var max = 0;
-        // make new balance
+        // make new balance (but not usable until next go)
         var nextBalance = balance + robots;
+        // always buy geodes if we can
         if (balance >= geodeCost)
         {
             //Console.WriteLine($"CAN MAKE GEODES {timeRemaining}");
             var geodesProduced = timeRemaining;
             max = Math.Max(max, geodesProduced + MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots, nextBalance - geodeCost, timeRemaining, cache));
         }
-        if (balance >= obsidianCost)
+        else
         {
-            //Console.WriteLine($"CAN MAKE OBSIDIAN");
-            max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 0, 1), nextBalance - obsidianCost, timeRemaining, cache));
-        }
-        if (balance >= clayCost)
-        {
-            //Console.WriteLine($"CAN MAKE CLAY");
-            max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 1, 0), nextBalance - clayCost, timeRemaining, cache));
-        }
-        if (balance >= oreCost)
-        {
-            //Console.WriteLine($"CAN MAKE ORE");
-            max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (1, 0, 0), nextBalance - oreCost, timeRemaining, cache));
-        }
+            // Geode costs obsidian and ore
+            var weNeedMoreObsidian = (geodeCost - balance).Z > 0;
+            var weNeedMoreOre = (geodeCost - balance).X > 0;
+            var weNeedMoreClay = false;
 
-        // do nothing in this minute
-        max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots, nextBalance, timeRemaining, cache));
+            if (balance >= obsidianCost)
+            {
+                //Console.WriteLine($"CAN MAKE OBSIDIAN");
+                max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 0, 1), nextBalance - obsidianCost, timeRemaining, cache));
+            }
+
+            
+
+            if (balance >= clayCost)
+            {
+                //Console.WriteLine($"CAN MAKE CLAY");
+                max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 1, 0), nextBalance - clayCost, timeRemaining, cache));
+            }
+            if (balance >= oreCost)
+            {
+                //Console.WriteLine($"CAN MAKE ORE");
+                max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (1, 0, 0), nextBalance - oreCost, timeRemaining, cache));
+            }
+
+            // do nothing in this minute
+            max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots, nextBalance, timeRemaining, cache));
+        }
         cache[cacheKey] = max;
         return max;
     }
