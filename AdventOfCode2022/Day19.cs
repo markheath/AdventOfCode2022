@@ -47,10 +47,14 @@ public class Day19 : ISolver
                 max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 0, 1), nextBalance - obsidianCost, timeRemaining, cache));
             }
 
-            if (balance >= clayCost)
+            if (balance.X < 3 * clayCost.X) // only buy if we've not got loads
             {
-                //Console.WriteLine($"CAN MAKE CLAY");
-                max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 1, 0), nextBalance - clayCost, timeRemaining, cache));
+                if (balance >= clayCost)
+                {
+                    //Console.WriteLine($"CAN MAKE CLAY");
+                    max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 1, 0), nextBalance - clayCost, timeRemaining, cache));
+                }
+
             }
 
             if (balance.X < 3 * oreCost.X) // only buy if we've not got loads
