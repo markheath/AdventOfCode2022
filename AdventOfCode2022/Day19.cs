@@ -4,7 +4,7 @@ namespace AdventOfCode2022;
 
 public class Day19 : ISolver
 {
-    public (string, string) ExpectedResult => ("1766", "");
+    public (string, string) ExpectedResult => ("1766", "30780");
 
     
 
@@ -72,7 +72,9 @@ public class Day19 : ISolver
     public (string, string) Solve(string[] input)
     {
         var part1 = input.Select((b,index) => new { Geodes = Part1(b, 24), Blueprint = index + 1 }).Sum(x => x.Geodes * x.Blueprint);
-        return ($"{part1}", $"0");
+        var part2 = input.Take(3).Select(b => (long)Part1(b, 32)).Aggregate((a,b) => a*b);
+
+        return ($"{part1}", $"{part2}");
     }
 
 
