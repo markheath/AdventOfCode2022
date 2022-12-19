@@ -40,10 +40,6 @@ public class Day19 : ISolver
         }
         else
         {
-            // Geode costs obsidian and ore
-            var weNeedMoreObsidian = (geodeCost - balance).Z > 0;
-            var weNeedMoreOre = (geodeCost - balance).X > 0;
-            var weNeedMoreClay = false;
 
             if (balance >= obsidianCost)
             {
@@ -51,20 +47,22 @@ public class Day19 : ISolver
                 max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 0, 1), nextBalance - obsidianCost, timeRemaining, cache));
             }
 
-            
-
             if (balance >= clayCost)
             {
                 //Console.WriteLine($"CAN MAKE CLAY");
                 max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (0, 1, 0), nextBalance - clayCost, timeRemaining, cache));
             }
-            if (balance >= oreCost)
+
+            if (balance.X < 3 * oreCost.X) // only buy if we've not got loads
             {
-                //Console.WriteLine($"CAN MAKE ORE");
-                max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (1, 0, 0), nextBalance - oreCost, timeRemaining, cache));
+                if (balance >= oreCost)
+                {
+                    //Console.WriteLine($"CAN MAKE ORE");
+                    max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots + (1, 0, 0), nextBalance - oreCost, timeRemaining, cache));
+                }
             }
 
-            // do nothing in this minute
+            // do nothing in this minute (can't afford anything, or don't need anything we can afford)
             max = Math.Max(max, MaximumGeodes(oreCost, clayCost, obsidianCost, geodeCost, robots, nextBalance, timeRemaining, cache));
         }
         cache[cacheKey] = max;
