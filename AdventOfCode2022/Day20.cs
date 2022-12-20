@@ -2,7 +2,7 @@
 
 public class Day20 : ISolver
 {
-    public (string, string) ExpectedResult => ("11616", "");
+    public (string, string) ExpectedResult => ("11616", "9937909178485");
 
     public (string, string) Solve(string[] input)
     {
@@ -11,15 +11,14 @@ public class Day20 : ISolver
 
     public long Part1(IEnumerable<string> input)
     {
-        var numbers = input.Select(int.Parse).ToList();
+        var numbers = input.Select(long.Parse).ToList();
         var allNodes = ToLinkedList(numbers).ToList();
         var zeroNode = allNodes.Single(n => n.Value == 0);
         foreach (var originalNode in allNodes)
         {
-            Console.WriteLine($"Moving {originalNode.Value}");
-            originalNode.Move(originalNode.Value);
-            Console.WriteLine(string.Join(',', allNodes[0].Enumerate().Select(n => n.Value)));
-            //break; 
+            var moveSteps = (int) Math.Abs(originalNode.Value % (allNodes.Count - 1));
+            originalNode.Move(originalNode.Value >= 0 ? moveSteps : moveSteps * -1);
+            //Console.WriteLine(string.Join(',', allNodes[0].Enumerate().Select(n => n.Value)));
         }
         // lazy!
         var val1 = zeroNode.Skip(1000).Value;
@@ -28,13 +27,36 @@ public class Day20 : ISolver
         return val1 + val2 + val3;
     }
 
-    private static IEnumerable<Node<int>> ToLinkedList(List<int> numbers)
+    public long Part2(IEnumerable<string> input)
     {
-        List<Node<int>> allNodes = new List<Node<int>>();
-        Node<int>? prev = null;
+        var decryptionKey = 811589153;
+        var numbers = input.Select(n => long.Parse(n) * decryptionKey).ToList();
+        var allNodes = ToLinkedList(numbers).ToList();
+        var zeroNode = allNodes.Single(n => n.Value == 0);
+        for (var n = 0; n < 10; n++)
+        {
+            foreach (var originalNode in allNodes)
+            {
+                var moveSteps = (int) Math.Abs(originalNode.Value % (allNodes.Count - 1));
+                originalNode.Move(originalNode.Value >= 0 ? moveSteps : moveSteps * -1);
+                //Console.WriteLine(string.Join(',', allNodes[0].Enumerate().Select(n => n.Value)));
+            }
+        }
+        // lazy!
+        var val1 = zeroNode.Skip(1000).Value;
+        var val2 = zeroNode.Skip(2000).Value;
+        var val3 = zeroNode.Skip(3000).Value;
+        return val1 + val2 + val3;
+    }
+
+
+    private static IEnumerable<Node<long>> ToLinkedList(List<long> numbers)
+    {
+        List<Node<long>> allNodes = new List<Node<long>>();
+        Node<long>? prev = null;
         foreach (var number in numbers)
         {
-            var newNode = new Node<int>(number, prev);
+            var newNode = new Node<long>(number, prev);
             allNodes.Add(newNode);
             if (prev != null) { prev.Next = newNode; }
             prev = newNode;
@@ -119,6 +141,5 @@ public class Day20 : ISolver
         public T Value { get; }
     }
 
-    long Part2(IEnumerable<string> input) => 0;
 
 }

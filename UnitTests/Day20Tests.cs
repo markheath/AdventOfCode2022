@@ -19,6 +19,16 @@ public class Day20Tests
         var solver = new Day20();
         var n = solver.Part1(TestInput.Split("\r\n"));
         Assert.AreEqual(3, n);
+        
+    }
+
+
+    [Test]
+    public void Day20Part2TestInput()
+    {
+        var solver = new Day20();
+        var n = solver.Part2(TestInput.Split("\r\n"));
+        Assert.AreEqual(1623178306, n);
     }
 
     /*
