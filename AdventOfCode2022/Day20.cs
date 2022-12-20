@@ -14,17 +14,18 @@ public class Day20 : ISolver
         var numbers = input.Select(long.Parse).ToList();
         var allNodes = ToLinkedList(numbers).ToList();
         var zeroNode = allNodes.Single(n => n.Value == 0);
+        Mix(allNodes);
+        return SumCoordinates(zeroNode);
+    }
+
+    private static void Mix(ICollection<Node<long>> allNodes)
+    {
         foreach (var originalNode in allNodes)
         {
-            var moveSteps = (int) Math.Abs(originalNode.Value % (allNodes.Count - 1));
+            var moveSteps = (int)Math.Abs(originalNode.Value % (allNodes.Count - 1));
             originalNode.Move(originalNode.Value >= 0 ? moveSteps : moveSteps * -1);
             //Console.WriteLine(string.Join(',', allNodes[0].Enumerate().Select(n => n.Value)));
         }
-        // lazy!
-        var val1 = zeroNode.Skip(1000).Value;
-        var val2 = zeroNode.Skip(2000).Value;
-        var val3 = zeroNode.Skip(3000).Value;
-        return val1 + val2 + val3;
     }
 
     public long Part2(IEnumerable<string> input)
@@ -35,20 +36,21 @@ public class Day20 : ISolver
         var zeroNode = allNodes.Single(n => n.Value == 0);
         for (var n = 0; n < 10; n++)
         {
-            foreach (var originalNode in allNodes)
-            {
-                var moveSteps = (int) Math.Abs(originalNode.Value % (allNodes.Count - 1));
-                originalNode.Move(originalNode.Value >= 0 ? moveSteps : moveSteps * -1);
-                //Console.WriteLine(string.Join(',', allNodes[0].Enumerate().Select(n => n.Value)));
-            }
+            Mix(allNodes);
         }
-        // lazy!
-        var val1 = zeroNode.Skip(1000).Value;
-        var val2 = zeroNode.Skip(2000).Value;
-        var val3 = zeroNode.Skip(3000).Value;
-        return val1 + val2 + val3;
+        return SumCoordinates(zeroNode);
     }
 
+    private static long SumCoordinates(Node<long> zeroNode)
+    {
+        long sum = 0;
+        for (var n = 0; n < 3; n++)
+        {
+            zeroNode = zeroNode.Skip(1000);
+            sum += zeroNode.Value;
+        }
+        return sum;
+    }
 
     private static IEnumerable<Node<long>> ToLinkedList(List<long> numbers)
     {
