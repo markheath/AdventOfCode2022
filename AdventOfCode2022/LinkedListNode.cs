@@ -23,7 +23,7 @@ class LinkedListNode<T>
         foreach (var item in items)
         {
             var newNode = new LinkedListNode<T>(item, tail);
-            if (head == null) head = newNode;
+            head ??= newNode;
             if (tail != null) { tail.Next = newNode; }
             tail = newNode;
         }
@@ -42,6 +42,8 @@ class LinkedListNode<T>
         for (var n = 0; n < Math.Abs(steps); n++)
         {
             target = steps > 0 ? target.Next : target.Prev;
+            // normally expecting to be used in a circular list where we can wrap round
+            if (target == null) throw new InvalidOperationException("Not enough items in the list");
         }
         return target;
     }
@@ -49,9 +51,10 @@ class LinkedListNode<T>
     public void Move(int steps)
     {
         if (steps == 0) return;
-        var startingPoint = steps > 0 ? this.Prev : this.Next;
+        var startingPoint = steps > 0 ? Prev : Next;
         // take myself out
         Remove();
+        if (startingPoint == null) throw new NotImplementedException("not implemented skip for non-circular lists yet");
 
         var target = startingPoint.Skip(steps);
 
@@ -72,28 +75,28 @@ class LinkedListNode<T>
 
     public void InsertAfter(LinkedListNode<T> target)
     {
-        this.Next = target.Next;
-        this.Prev = target;
-
-        target.Next.Prev = this;
+        Next = target.Next;
+        Prev = target;
+        
+        if (target.Next != null) target.Next.Prev = this;
         target.Next = this;
     }
 
     public void InsertBefore(LinkedListNode<T> target)
     {
-        this.Next = target;
-        this.Prev = target.Prev;
+        Next = target;
+        Prev = target.Prev;
 
-        target.Prev.Next = this;
+        if (target.Prev != null) target.Prev.Next = this;
         target.Prev = this;
     }
 
     public void Remove()
     {
         // take myself out
-        this.Prev.Next = this.Next;
-        this.Next.Prev = this.Prev;
-        this.Prev = null;
-        this.Next = null;
+        if (Prev != null) Prev.Next = Next;
+        if (Next != null) Next.Prev = Prev;
+        Prev = null;
+        Next = null;
     }
 }

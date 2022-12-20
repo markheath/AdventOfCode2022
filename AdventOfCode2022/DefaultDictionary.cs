@@ -4,7 +4,11 @@ using SuperLinq;
 
 namespace AdventOfCode2022;
 
-class DefaultDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+
+/// <summary>
+/// Dictionary that will return a default value for any missing keys
+/// </summary>
+class DefaultDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
 {
     private readonly Dictionary<TKey, TValue> dictionary;
     public DefaultDictionary(TValue defaultValue)
