@@ -22,10 +22,10 @@ drzm: hmdt - zczc
 hmdt: 32";
 
     [Test]
-    public void Day21Part1TestInput()
+    public void Day21TestInput()
     {
         var solver = new Day21();
         var n = solver.Solve(TestInput.Split("\r\n"));
-        Assert.AreEqual(("152","0"), n);       
+        Assert.AreEqual(("152","301"), n);       
     }
 }
