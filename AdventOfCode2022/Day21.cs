@@ -17,6 +17,7 @@ public class Day21 : ISolver
         public string LeftHand { get; }
         public string RightHand { get; }
         public string Operator { get; }
+        public bool Solved { get; private set; }
         public Calc(string s)
         {
             var m = Regex.Matches(s, "[a-z]+");
@@ -60,12 +61,40 @@ public class Day21 : ISolver
                 yield return new Calc($"{c}: {b} / {a}");
             }
         }
+        public bool Solve(IDictionary<string, long> answers, bool recurse = true)
+        {
+            if (answers.ContainsKey(LeftHand) && answers.ContainsKey(RightHand))
+            {
+                answers[Result] = Operator switch
+                {
+                    "+" => answers[LeftHand] + answers[RightHand],
+                    "-" => answers[LeftHand] - answers[RightHand],
+                    "/" => answers[LeftHand] / answers[RightHand],
+                    "*" => answers[LeftHand] * answers[RightHand],
+                    _ => throw new InvalidOperationException($"Unknown operator [{Operator}]")
+                };
+                Solved = true;
+                return true;
+            }
+            if (recurse)
+            {
+                foreach (var rearranged in Rearrange())
+                {
+                    if (rearranged.Solve(answers, false))
+                    {
+                        Solved = true;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     long Part1(IEnumerable<string> input)
     {
         ParseInput(input, out var calcs, out var answers);
-        return Seek("root", calcs, answers);
+        return Seek("root", calcs, answers, false);
     }
 
     long Part2(IEnumerable<string> input)
@@ -82,33 +111,18 @@ public class Day21 : ISolver
         calcs.Remove(rootCalc);
         calcs.Add(new Calc($"root: {rootCalc.LeftHand} - {rootCalc.RightHand}"));
 
-        // put in all variations of all calcs
-        foreach (var calc in calcs.ToList())
-        {
-            calcs.AddRange(calc.Rearrange());
-        }
-
-        return Seek("humn", calcs, answers);
+        return Seek("humn", calcs, answers, true);
 
     }
 
-    private static long Seek(string target, List<Calc> calcs, Dictionary<string, long> answers)
+    private static long Seek(string target, List<Calc> calcs, Dictionary<string, long> answers, bool rearrange)
     {
         while (!answers.ContainsKey(target))
         {
             bool solved = false;
-            foreach (var calc in calcs.Where(c => !answers.ContainsKey(c.Result) && answers.ContainsKey(c.LeftHand) && answers.ContainsKey(c.RightHand)))
+            foreach (var calc in calcs.Where(c => !c.Solved))
             {
-                // Console.WriteLine($"SOLVING {calc}");
-                answers[calc.Result] = calc.Operator switch
-                {
-                    "+" => answers[calc.LeftHand] + answers[calc.RightHand],
-                    "-" => answers[calc.LeftHand] - answers[calc.RightHand],
-                    "/" => answers[calc.LeftHand] / answers[calc.RightHand],
-                    "*" => answers[calc.LeftHand] * answers[calc.RightHand],
-                    _ => throw new InvalidOperationException($"Unknown operator [{calc.Operator}]")
-                };
-                solved = true;
+                solved |= calc.Solve(answers, rearrange);
             }
             if (!solved)
                 throw new InvalidOperationException("failed to solve any calc this round");
