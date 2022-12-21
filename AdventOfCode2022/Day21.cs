@@ -29,6 +29,37 @@ public class Day21 : ISolver
         {
             return $"{Result}={LeftHand}{Operator}{RightHand}";
         }
+        public IEnumerable<Calc> Rearrange()
+        {
+            var a = Result;
+            var b = LeftHand;
+            var c = RightHand;
+            var op = Operator;
+            if (op == "+")
+            {
+                // a = b + c so b = a - c and c = a - b
+                yield return new Calc($"{b}: {a} - {c}");
+                yield return new Calc($"{c}: {a} - {b}");
+            }
+            else if (op == "-")
+            {
+                // a = b - c so b = a + c and c = b - a
+                yield return new Calc($"{b}: {a} + {c}");
+                yield return new Calc($"{c}: {b} - {a}");
+            }
+            else if (op == "*")
+            {
+                // a = b * c so b = a / c and c = a / b
+                yield return new Calc($"{b}: {a} / {c}");
+                yield return new Calc($"{c}: {a} / {b}");
+            }
+            else if (op == "/")
+            {
+                // a = b / c so b = a * c and c = b / a
+                yield return new Calc($"{b}: {a} * {c}");
+                yield return new Calc($"{c}: {b} / {a}");
+            }
+        }
     }
 
     long Part1(IEnumerable<string> input)
@@ -54,34 +85,7 @@ public class Day21 : ISolver
         // put in all variations of all calcs
         foreach (var calc in calcs.ToList())
         {
-            var a = calc.Result;
-            var b = calc.LeftHand;
-            var c = calc.RightHand;
-            var op = calc.Operator;
-            if (op == "+")
-            {
-                // a = b + c so b = a - c and c = a - b
-                calcs.Add(new Calc($"{b}: {a} - {c}"));
-                calcs.Add(new Calc($"{c}: {a} - {b}"));
-            }
-            else if (op == "-")
-            {
-                // a = b - c so b = a + c and c = b - a
-                calcs.Add(new Calc($"{b}: {a} + {c}"));
-                calcs.Add(new Calc($"{c}: {b} - {a}"));
-            }
-            else if (op == "*")
-            {
-                // a = b * c so b = a / c and c = a / b
-                calcs.Add(new Calc($"{b}: {a} / {c}"));
-                calcs.Add(new Calc($"{c}: {a} / {b}"));
-            }
-            else if (op == "/")
-            {
-                // a = b / c so b = a * c and c = b / a
-                calcs.Add(new Calc($"{b}: {a} * {c}"));
-                calcs.Add(new Calc($"{c}: {b} / {a}"));
-            }
+            calcs.AddRange(calc.Rearrange());
         }
 
         return Seek("humn", calcs, answers);
