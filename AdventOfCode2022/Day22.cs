@@ -13,7 +13,7 @@ public class Day22 : ISolver
 
     long Part1(string[] input)
     {
-        var maxWidth = input.Max(line => line.Length);
+        var maxWidth = input.Take(input.Length-1).Max(line => line.Length);
         var gridLines = input.TakeWhile(line => !String.IsNullOrEmpty(line)).Select(line => line.PadRight(maxWidth)).ToArray();
         var grid = Grid<char>.ParseToGrid(gridLines, c => c);
         // You begin the path in the leftmost open tile of the top row of tiles.
@@ -25,6 +25,31 @@ public class Day22 : ISolver
         var directionIndex = 0;
         var instructions = Regex.Matches(input.Last(), "[RL]|(\\d+)").Select(m => m.Value);
         var currentPos = startPos;
+        var teleports = new Dictionary<(Coord, Coord), (Coord, Coord)>();
+        
+        // do all the step off the right edge first
+        for(var y = 0; y < grid.Height; y++)
+        {
+            var minX = Enumerable.Range(0, grid.Width).First(x => grid[(x, y)] != ' ');
+            var maxX = Enumerable.Range(0, grid.Width).Last(x => grid[(x, y)] != ' ');
+
+            // step left off left edge, appear on right, still facing left
+            teleports[((minX, y), (minX - 1, y))] = ((maxX, y), (-1, 0));
+            // step right off right edge, appear on left, still facing right
+            teleports[((maxX, y), (maxX + 1,y))] = ((minX, y), (1, 0));
+        }
+        for (var x = 0; x < grid.Width; x++)
+        {
+            var minY = Enumerable.Range(0, grid.Height).First(y => grid[(x, y)] != ' ');
+            var maxY = Enumerable.Range(0, grid.Height).Last(y => grid[(x, y)] != ' ');
+
+            // step up off top edge, appear at bottom, still facing up
+            teleports[((x, minY), (x, minY - 1))] = ((x, maxY), (0, -1));
+            // step down off bottom edge, appear at top, still facing down
+            teleports[((x, maxY), (x, maxY + 1))] = ((x, minY), (0, 1));
+        }
+
+
         foreach (var instruction in instructions)
         {
             if (instruction == "R")
@@ -43,8 +68,20 @@ public class Day22 : ISolver
                 {
                     var delta = directions[directionIndex];
                     var nextPos = currentPos + delta;
-                    nextPos = WrapRoundIfNeeded(grid, nextPos);
-                    nextPos = MoveThroughEmptySpace(grid, delta, nextPos);
+                    if (teleports.ContainsKey((currentPos,nextPos)))
+                    {
+                        (nextPos, var newDelta) = teleports[(currentPos, nextPos)];
+                        directionIndex = Array.IndexOf(directions, newDelta);
+                        if (directionIndex == -1) throw new InvalidOperationException("can't find dir");
+                    }
+                    if (grid[nextPos] == ' ')
+                    {
+                        // we missed a teleport
+                        throw new InvalidOperationException($"oops {nextPos} (was at {currentPos} + {delta}");
+                    }
+
+                    //nextPos = WrapRoundIfNeeded(grid, nextPos);
+                    //nextPos = MoveThroughEmptySpace(grid, delta, nextPos);
                     if (grid[nextPos] == '#')
                     {
                         // we're blocked by a wall, just stop
