@@ -2,7 +2,7 @@
 
 public class Day23 : ISolver
 {
-    public (string, string) ExpectedResult => ("3874", ""); // 914 too low
+    public (string, string) ExpectedResult => ("3874", "948"); // 914 too low, 949 too high
 
     public (string, string) Solve(string[] input)
     {
@@ -18,27 +18,48 @@ public class Day23 : ISolver
         new Coord[] { (1,-1), (1,0), (1,1) } // EAST
     };
 
-    public long Part1(string[] input)
+    public long Part1(string[] input, bool drawGrids = false)
     {
         var elfPositions = ParseElfPositions(input);
-        for(var r = 0; r < 10; r++)
-        {            
+        directionIndex = 0; 
+        int minX, maxX, minY, maxY;
+        for (var r = 1; r <= 10; r++)
+        {
             (elfPositions, var _) = ProposeNewPositions(elfPositions);
             directionIndex++;
             directionIndex %= 4;
+            if (drawGrids)
+            {
+                Console.WriteLine($"== End of round {r} ==");
+                GetBounds(elfPositions, out minX, out maxX, out minY, out maxY);
+                for (var y = minY; y <= maxY; y++)
+                {
+                    for (var x = minX; x <= maxX; x++)
+                    {
+                        Console.Write(elfPositions.Contains((x, y)) ? '#' : '.');
+                    }
+                    Console.WriteLine();
+                }
+            }
         }
-        var minX = elfPositions.Min(p => p.X);
-        var maxX = elfPositions.Max(p => p.X);
-        var minY = elfPositions.Min(p => p.Y);
-        var maxY = elfPositions.Max(p => p.Y);
+        GetBounds(elfPositions, out minX, out maxX, out minY, out maxY);
         var area = (maxX - minX + 1) * (maxY - minY + 1);
         return area - elfPositions.Count;
+    }
+
+    private static void GetBounds(HashSet<Coord> elfPositions, out int minX, out int maxX, out int minY, out int maxY)
+    {
+        minX = elfPositions.Min(p => p.X);
+        maxX = elfPositions.Max(p => p.X);
+        minY = elfPositions.Min(p => p.Y);
+        maxY = elfPositions.Max(p => p.Y);
     }
 
     public long Part2(string[] input)
     {
         var elfPositions = ParseElfPositions(input);
-        var round = 1;
+        directionIndex = 0; // don't forget to reset for part 2
+        var round = 0;
         var moved = 0;
         do
         {
@@ -92,7 +113,7 @@ public class Day23 : ISolver
             moves.Add(newPos, elf);
         }
         if (moves.Count != currentPositions.Count) throw new InvalidOperationException("lost an elf!");
-        // moved = moves.Count(kvp => kvp.Key != kvp.Value); - safer count - but didn't work
+        // moved = moves.Count(kvp => kvp.Key != kvp.Value); // safer count - but gives same result
         return (moves.Keys.ToHashSet(), moved);
     }
 
