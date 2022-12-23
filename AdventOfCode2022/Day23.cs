@@ -1,11 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-
-namespace AdventOfCode2022;
+﻿namespace AdventOfCode2022;
 
 public class Day23 : ISolver
 {
-    public (string, string) ExpectedResult => ("3874", "");
+    public (string, string) ExpectedResult => ("3874", ""); // 914 too low
 
     public (string, string) Solve(string[] input)
     {
@@ -26,7 +23,7 @@ public class Day23 : ISolver
         var elfPositions = ParseElfPositions(input);
         for(var r = 0; r < 10; r++)
         {            
-            elfPositions = ProposeNewPositions(elfPositions);
+            (elfPositions, var _) = ProposeNewPositions(elfPositions);
             directionIndex++;
             directionIndex %= 4;
         }
@@ -38,8 +35,25 @@ public class Day23 : ISolver
         return area - elfPositions.Count;
     }
 
-    private HashSet<Coord> ProposeNewPositions(HashSet<Coord> currentPositions)
+    public long Part2(string[] input)
     {
+        var elfPositions = ParseElfPositions(input);
+        var round = 1;
+        var moved = 0;
+        do
+        {
+            (elfPositions, moved) = ProposeNewPositions(elfPositions);
+            directionIndex++;
+            directionIndex %= 4;
+            round++;
+        } while (moved > 0);
+
+        return round;
+    }
+
+    private (HashSet<Coord>, int) ProposeNewPositions(HashSet<Coord> currentPositions)
+    {
+        var moved = 0;
         HashSet<Coord> blocked = new();
         Dictionary<Coord,Coord> moves = new(); // to, from
         foreach(var elf in currentPositions)
@@ -67,16 +81,19 @@ public class Day23 : ISolver
                 if (moves.ContainsKey(newPos))
                 {
                     var origPos = moves[newPos];
+                    moved--;
                     moves.Remove(newPos);
                     moves.Add(origPos, origPos); // that elf is staying put instead of the original planned move
                 }
                 newPos = elf; // we're going to stay where we were
             }
             blocked.Add(newPos); // no one else can go here
+            if (newPos != elf) moved++;
             moves.Add(newPos, elf);
         }
         if (moves.Count != currentPositions.Count) throw new InvalidOperationException("lost an elf!");
-        return moves.Keys.ToHashSet();
+        // moved = moves.Count(kvp => kvp.Key != kvp.Value); - safer count - but didn't work
+        return (moves.Keys.ToHashSet(), moved);
     }
 
     private static HashSet<Coord> ParseElfPositions(string[] input)
@@ -88,7 +105,5 @@ public class Day23 : ISolver
                     elfPositions.Add((x, y));
         return elfPositions;
     }
-
-    long Part2(IEnumerable<string> input) => 0;
 
 }

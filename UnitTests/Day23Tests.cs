@@ -23,6 +23,6 @@ public class Day23Tests
     {
         var solver = new Day23();
         var n = solver.Solve(TestInput.Split("\r\n"));
-        Assert.AreEqual(("110", "0"), n);       
+        Assert.AreEqual(("110", "20"), n);       
     }
 }
