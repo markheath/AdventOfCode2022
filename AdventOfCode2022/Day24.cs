@@ -15,29 +15,27 @@ public class Day24 : ISolver
         exit = (exitX, input.Length - 2);
         innerWidth = input[0].Length - 2;
         innerHeight = input.Length - 2;
-        var upperLimit = 400; // pick a max depth to start with
-        var bestSoFar = upperLimit; //innerWidth * innerHeight; // set a sensible upper bound
-        Console.WriteLine($"upper bound {bestSoFar}");
-        Seek(entrance, exit, ref bestSoFar, 0);
-        var part1 = bestSoFar;
+        
+        var part1 = Seek(entrance, exit, 0);
         Console.WriteLine($"reached goal at {part1}");
-        bestSoFar += upperLimit;
-        seen.Clear();
-        Seek(exit, entrance, ref bestSoFar, part1);
-        var gotBackBy = bestSoFar;
-        Console.WriteLine($"got back to start at {gotBackBy} ({gotBackBy - part1})");
-        bestSoFar += upperLimit;
-        seen.Clear();
-        Seek(entrance, exit, ref bestSoFar, gotBackBy);
-        var part2 = bestSoFar;
-        Console.WriteLine($"returned to target at {part2} ({part2 - gotBackBy})");
+        var part2a = Seek(exit, entrance, part1);
+        Console.WriteLine($"got back to start in {part2a}");
+        var part2b = Seek(entrance, exit, part1 + part2a);
+        Console.WriteLine($"returned to target in {part2b}");
+        var part2 = part1 + part2a + part2b;
         return ($"{part1}", $"{part2}");
     }
 
-    /*int Seek(Coord startPos, Coord targetPos, int startTime)
+    int Seek(Coord startPos, Coord targetPos, int startTime)
     {
-
-    }*/
+        var upperLimit = 400; // pick a max depth to start with
+        var bestSoFar = startTime + upperLimit; //innerWidth * innerHeight; // set a sensible upper bound
+        seen.Clear();
+        Seek(startPos, targetPos, ref bestSoFar, startTime);
+        var extraTime = bestSoFar - startTime;
+        if (extraTime >=  upperLimit) throw new InvalidOperationException($"Failed to find a route shorter than {upperLimit}");
+        return extraTime;
+    }
 
     void CacheHurricanes(int t, IEnumerable<Hurricane> hurricanes)
     {
