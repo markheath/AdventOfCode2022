@@ -27,7 +27,7 @@ public class Day24Tests
     {
         var solver = new Day24();
         var n = solver.Solve(TestInput.Split("\r\n"));
-        Assert.AreEqual(("18", "0"), n);       
+        Assert.AreEqual(("18", "54"), n);       
     }
 
 }
