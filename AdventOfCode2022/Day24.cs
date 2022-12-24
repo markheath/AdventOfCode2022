@@ -2,7 +2,7 @@
 
 public class Day24 : ISolver
 {
-    public (string, string) ExpectedResult => ("", "");
+    public (string, string) ExpectedResult => ("292", "");
 
     public (string, string) Solve(string[] input)
     {
@@ -35,11 +35,14 @@ public class Day24 : ISolver
     }
 
     private Dictionary<int, (HashSet<Coord>, IEnumerable<Hurricane>)> hurricaneCache = new();
+    private HashSet<(int, Coord)> seen = new();
 
     private void Seek(Coord currentPos, Coord targetPos, ref int bestSoFar, int t, 
         IEnumerable<Hurricane> hurricanesAtT, int innerWidth, int innerHeight)
     {
         t++;
+        if (seen.Contains((t, currentPos))) return;
+        seen.Add((t, currentPos));
         if(t > bestSoFar)
         {
             // abandon this route
@@ -47,7 +50,7 @@ public class Day24 : ISolver
         }
         if (!hurricaneCache.ContainsKey(t)) CacheHurricanes(t, MoveHuricanes(hurricanesAtT, innerWidth, innerHeight));
         // to try first right, then down, then stay put, then left
-        var deltas = new Coord[] { (1, 0), (0, 1), (0, 0), (-1,0), (0,-1)};
+        var deltas = new Coord[] { (1, 0), (0, 1), (-1,0), (0,-1), (0, 0)};
         var blockedByHurricanes = hurricaneCache[t].Item1;
         foreach(var move in deltas)
         {
@@ -58,8 +61,8 @@ public class Day24 : ISolver
                 {
                     Console.WriteLine($"new best time {t}");
                     bestSoFar = t;
-                    return;
                 }
+                return;
             }
             if (blockedByHurricanes.Contains(newPos) || newPos.X < 0 || newPos.Y < 0 || newPos.X >= innerWidth || newPos.Y >= innerHeight)
             {
